@@ -1,0 +1,9 @@
+{
+  "name": "writing-plans",
+  "category": "development",
+  "trigger_phrases": ["write a plan", "break this down", "implementation plan", "plan the work", "task breakdown"],
+  "vault_paths": [".claude/skills/development/writing-plans/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

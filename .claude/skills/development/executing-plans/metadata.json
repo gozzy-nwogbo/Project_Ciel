@@ -1,0 +1,9 @@
+{
+  "name": "executing-plans",
+  "category": "development",
+  "trigger_phrases": ["execute the plan", "start implementation", "go", "run the plan", "implement the plan"],
+  "vault_paths": [".claude/skills/development/executing-plans/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "orchestrator",
+  "category": "meta",
+  "trigger_phrases": [
+    "what's next in the pipeline",
+    "pipeline status",
+    "which stage",
+    "route to next skill",
+    "check pipeline state"
+  ],
+  "vault_paths": [".claude/skills/meta/orchestrator/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "PASS"
+}

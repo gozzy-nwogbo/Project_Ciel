@@ -1,0 +1,9 @@
+{
+  "name": "brainstorming",
+  "category": "development",
+  "trigger_phrases": ["I want to build", "let's brainstorm", "help me design", "before we code", "explore alternatives", "what should we build"],
+  "vault_paths": [".claude/skills/development/brainstorming/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

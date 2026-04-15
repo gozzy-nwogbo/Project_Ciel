@@ -1,0 +1,9 @@
+{
+  "name": "using-git-worktrees",
+  "category": "development",
+  "trigger_phrases": ["create worktree", "git worktree", "parallel branch", "isolated workspace", "feature branch workspace"],
+  "vault_paths": [".claude/skills/development/using-git-worktrees/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

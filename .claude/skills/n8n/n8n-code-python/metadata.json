@@ -1,0 +1,9 @@
+{
+  "name": "n8n-code-python",
+  "category": "n8n",
+  "trigger_phrases": ["write python in n8n", "n8n python code node", "n8n _input syntax", "python standard library n8n", "python limitations n8n"],
+  "vault_paths": [".claude/skills/n8n/n8n-code-python/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

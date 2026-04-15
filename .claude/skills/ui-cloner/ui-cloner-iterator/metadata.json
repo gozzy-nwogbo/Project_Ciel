@@ -1,0 +1,15 @@
+{
+  "name": "ui-cloner-iterator",
+  "category": "ui-cloner",
+  "trigger_phrases": [
+    "iterate on build",
+    "run refinement loop",
+    "compare against site DNA",
+    "refine cloned site",
+    "iterator passes"
+  ],
+  "vault_paths": [".claude/skills/ui-cloner/ui-cloner-iterator/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

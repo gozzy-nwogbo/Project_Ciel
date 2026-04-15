@@ -1,0 +1,9 @@
+{
+  "name": "n8n-validation-expert",
+  "category": "n8n",
+  "trigger_phrases": ["n8n validation error", "validation warning", "false positive", "operator structure", "validation profile", "validation loop", "auto-sanitization"],
+  "vault_paths": [".claude/skills/n8n/n8n-validation-expert/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

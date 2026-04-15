@@ -1,0 +1,9 @@
+{
+  "name": "n8n-node-configuration",
+  "category": "n8n",
+  "trigger_phrases": ["configure n8n node", "n8n property dependencies", "n8n required fields", "get_node detail level", "node configuration pattern", "n8n displayOptions"],
+  "vault_paths": [".claude/skills/n8n/n8n-node-configuration/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

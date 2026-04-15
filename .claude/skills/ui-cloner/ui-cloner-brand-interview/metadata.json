@@ -1,0 +1,15 @@
+{
+  "name": "ui-cloner-brand-interview",
+  "category": "ui-cloner",
+  "trigger_phrases": [
+    "brand interview",
+    "run phase 2",
+    "collect brand info",
+    "brand questions",
+    "interview for cloner"
+  ],
+  "vault_paths": [".claude/skills/ui-cloner/ui-cloner-brand-interview/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

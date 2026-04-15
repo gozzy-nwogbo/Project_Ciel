@@ -1,0 +1,40 @@
+{
+  "name": "asana",
+  "category": "integrations",
+  "trigger_phrases": [
+    "check my tasks",
+    "asana tasks",
+    "create a task",
+    "update task status",
+    "project status",
+    "search asana",
+    "my open tasks",
+    "add a comment to task"
+  ],
+  "vault_paths": [".claude/skills/integrations/asana/SKILL.md"],
+  "primitives_required": [
+    "get_me",
+    "get_user",
+    "get_users",
+    "get_teams",
+    "get_projects",
+    "get_project",
+    "get_tasks",
+    "get_task",
+    "get_my_tasks",
+    "get_attachments",
+    "get_portfolios",
+    "get_portfolio",
+    "get_items_for_portfolio",
+    "get_status_overview",
+    "search_objects",
+    "search_tasks_preview",
+    "create_tasks",
+    "create_task_preview",
+    "update_tasks",
+    "add_comment",
+    "create_project_status_update"
+  ],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "ui-cloner-forensic-audit",
+  "category": "ui-cloner",
+  "trigger_phrases": [
+    "forensic audit",
+    "analyze site DNA",
+    "run phase 1 audit",
+    "forensic site audit",
+    "audit this website"
+  ],
+  "vault_paths": [".claude/skills/ui-cloner/ui-cloner-forensic-audit/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

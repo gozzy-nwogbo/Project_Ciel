@@ -1,0 +1,9 @@
+{
+  "name": "receiving-code-review",
+  "category": "development",
+  "trigger_phrases": ["address review comments", "fix review feedback", "respond to PR comments", "code review received", "handle review"],
+  "vault_paths": [".claude/skills/development/receiving-code-review/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

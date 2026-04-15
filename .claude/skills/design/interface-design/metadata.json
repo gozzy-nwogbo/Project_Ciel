@@ -1,0 +1,9 @@
+{
+  "name": "interface-design",
+  "category": "design",
+  "trigger_phrases": ["build interface", "design UI", "interface design", "design system", "dashboard layout", "UI component"],
+  "vault_paths": [".claude/skills/design/interface-design/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

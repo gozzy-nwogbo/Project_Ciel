@@ -1,0 +1,16 @@
+{
+  "name": "agent-harness",
+  "category": "meta",
+  "trigger_phrases": [
+    "evaluate my agent harness",
+    "audit this CLAUDE.md",
+    "design the harness for",
+    "run a retrospective",
+    "what primitives should I build first",
+    "is my agent production-ready"
+  ],
+  "vault_paths": [".claude/skills/meta/agent-harness/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

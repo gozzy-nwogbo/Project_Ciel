@@ -1,0 +1,9 @@
+{
+  "name": "verification-before-completion",
+  "category": "development",
+  "trigger_phrases": ["verify before done", "is this actually fixed", "completion check", "before merging", "pre-merge verification"],
+  "vault_paths": [".claude/skills/development/verification-before-completion/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

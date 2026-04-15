@@ -1,0 +1,14 @@
+# Secrets
+.env
+.mcp.json
+
+# Personal data (use .template versions as reference)
+.claude/user.md
+.claude/settings.json
+05-daily/2026-*.md
+
+# System
+.claude/logs/
+.DS_Store
+__pycache__/
+*.pyc
