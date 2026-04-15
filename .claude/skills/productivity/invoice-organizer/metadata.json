@@ -1,0 +1,17 @@
+{
+  "name": "invoice-organizer",
+  "category": "productivity",
+  "trigger_phrases": [
+    "organize my invoices",
+    "sort receipts for tax",
+    "rename my invoices",
+    "expense report prep",
+    "invoice summary",
+    "bookkeeping cleanup",
+    "tax prep receipts"
+  ],
+  "vault_paths": [".claude/skills/productivity/invoice-organizer/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

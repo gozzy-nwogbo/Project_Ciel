@@ -1,0 +1,9 @@
+{
+  "name": "systematic-debugging",
+  "category": "development",
+  "trigger_phrases": ["debug this", "why is this failing", "root cause", "systematic debugging", "bug investigation"],
+  "vault_paths": [".claude/skills/development/systematic-debugging/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

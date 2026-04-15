@@ -1,0 +1,9 @@
+{
+  "name": "n8n-expression-syntax",
+  "category": "n8n",
+  "trigger_phrases": ["n8n expression", "n8n {{}} syntax", "n8n $json variable", "n8n expression error", "webhook data access", "n8n $node reference"],
+  "vault_paths": [".claude/skills/n8n/n8n-expression-syntax/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

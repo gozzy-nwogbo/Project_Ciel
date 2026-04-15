@@ -1,0 +1,15 @@
+{
+  "name": "spec-contract",
+  "category": "meta",
+  "trigger_phrases": [
+    "write a spec contract",
+    "create spec for",
+    "spec before building",
+    "lock the spec",
+    "approve this spec"
+  ],
+  "vault_paths": [".claude/skills/meta/spec-contract/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

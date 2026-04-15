@@ -1,0 +1,23 @@
+{
+  "name": "google-calendar",
+  "category": "integrations",
+  "trigger_phrases": [
+    "what's on my calendar",
+    "am I free",
+    "today's events",
+    "next week's schedule",
+    "calendar conflicts",
+    "check availability",
+    "my meetings today",
+    "schedule for tomorrow"
+  ],
+  "vault_paths": [".claude/skills/integrations/google-calendar/SKILL.md"],
+  "primitives_required": [
+    "list_calendars",
+    "list_events",
+    "get_event",
+    "suggest_time"
+  ],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

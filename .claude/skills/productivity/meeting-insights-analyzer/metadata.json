@@ -1,0 +1,17 @@
+{
+  "name": "meeting-insights-analyzer",
+  "category": "productivity",
+  "trigger_phrases": [
+    "analyze this meeting",
+    "meeting insights",
+    "review this transcript",
+    "meeting dynamics",
+    "who talked the most",
+    "meeting facilitation feedback",
+    "action items from meeting"
+  ],
+  "vault_paths": [".claude/skills/productivity/meeting-insights-analyzer/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

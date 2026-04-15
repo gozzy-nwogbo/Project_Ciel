@@ -1,0 +1,15 @@
+{
+  "name": "skill-authoring",
+  "category": "meta",
+  "trigger_phrases": [
+    "audit this skill",
+    "validate skill",
+    "skill ready for production?",
+    "run skill audit",
+    "check skill against standard"
+  ],
+  "vault_paths": [".claude/skills/meta/skill-authoring/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "PASS"
+}

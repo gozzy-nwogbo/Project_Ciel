@@ -1,0 +1,9 @@
+{
+  "name": "mcp-builder",
+  "category": "development",
+  "trigger_phrases": ["build MCP server", "create MCP integration", "design MCP tools", "MCP server from scratch", "add MCP tools"],
+  "vault_paths": [".claude/skills/development/mcp-builder/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

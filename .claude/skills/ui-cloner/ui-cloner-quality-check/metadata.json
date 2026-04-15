@@ -1,0 +1,15 @@
+{
+  "name": "ui-cloner-quality-check",
+  "category": "ui-cloner",
+  "trigger_phrases": [
+    "quality check prompt",
+    "run phase 4",
+    "verify replication prompt",
+    "check prompt fidelity",
+    "quality self-check"
+  ],
+  "vault_paths": [".claude/skills/ui-cloner/ui-cloner-quality-check/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "test-driven-development",
+  "category": "development",
+  "trigger_phrases": ["write tests first", "TDD", "test driven", "red green refactor", "failing test first"],
+  "vault_paths": [".claude/skills/development/test-driven-development/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

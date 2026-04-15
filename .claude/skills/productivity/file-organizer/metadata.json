@@ -1,0 +1,17 @@
+{
+  "name": "file-organizer",
+  "category": "productivity",
+  "trigger_phrases": [
+    "organize my downloads",
+    "clean up this folder",
+    "find duplicate files",
+    "restructure this directory",
+    "archive old files",
+    "sort my files",
+    "folder structure"
+  ],
+  "vault_paths": [".claude/skills/productivity/file-organizer/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

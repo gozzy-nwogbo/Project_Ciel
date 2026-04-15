@@ -1,0 +1,9 @@
+{
+  "name": "subagent-driven-development",
+  "category": "development",
+  "trigger_phrases": ["execute plan with subagents", "parallel implementation", "subagent driven", "dispatch agents per task", "subagent execution"],
+  "vault_paths": [".claude/skills/development/subagent-driven-development/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

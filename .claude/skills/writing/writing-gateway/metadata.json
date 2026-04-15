@@ -1,0 +1,9 @@
+{
+  "name": "writing-gateway",
+  "category": "writing",
+  "trigger_phrases": ["write", "draft", "LinkedIn post", "email draft", "article", "essay", "copy", "letter", "cold outreach"],
+  "vault_paths": ["03-reflections/voice-profile.md", "02-knowledge/platform-rules.md", "03-reflections/voice-evolution-log.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

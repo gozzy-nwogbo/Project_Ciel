@@ -1,0 +1,9 @@
+{
+  "name": "n8n-mcp-tools-expert",
+  "category": "n8n",
+  "trigger_phrases": ["search n8n nodes", "validate n8n config", "n8n template", "n8n workflow management", "n8n MCP tool", "n8n credentials", "n8n audit", "n8n nodeType format"],
+  "vault_paths": [".claude/skills/n8n/n8n-mcp-tools-expert/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

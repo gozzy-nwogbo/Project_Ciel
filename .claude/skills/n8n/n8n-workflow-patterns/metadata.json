@@ -1,0 +1,9 @@
+{
+  "name": "n8n-workflow-patterns",
+  "category": "n8n",
+  "trigger_phrases": ["n8n workflow pattern", "build n8n workflow", "workflow architecture", "webhook processing", "AI agent workflow", "scheduled task", "database operations pattern"],
+  "vault_paths": [".claude/skills/n8n/n8n-workflow-patterns/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

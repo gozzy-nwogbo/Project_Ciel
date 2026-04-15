@@ -1,0 +1,9 @@
+{
+  "name": "webapp-testing",
+  "category": "development",
+  "trigger_phrases": ["test the webapp", "verify UI", "playwright test", "take screenshot", "check frontend", "browser test"],
+  "vault_paths": [".claude/skills/development/webapp-testing/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

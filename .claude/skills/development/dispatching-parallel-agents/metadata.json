@@ -1,0 +1,9 @@
+{
+  "name": "dispatching-parallel-agents",
+  "category": "development",
+  "trigger_phrases": ["parallelize", "dispatch agents", "run these in parallel", "independent tasks", "concurrent tasks"],
+  "vault_paths": [".claude/skills/development/dispatching-parallel-agents/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

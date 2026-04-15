@@ -1,0 +1,17 @@
+{
+  "name": "skill-creator",
+  "category": "meta",
+  "trigger_phrases": [
+    "create a new skill",
+    "build a skill",
+    "improve this skill",
+    "write a skill description",
+    "package a skill",
+    "update a skill",
+    "skill template"
+  ],
+  "vault_paths": [".claude/skills/meta/skill-creator/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

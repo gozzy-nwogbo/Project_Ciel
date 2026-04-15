@@ -1,0 +1,9 @@
+{
+  "name": "finishing-a-development-branch",
+  "category": "development",
+  "trigger_phrases": ["finish branch", "merge this", "open a PR", "done with this branch", "clean up branch", "wrap up feature"],
+  "vault_paths": [".claude/skills/development/finishing-a-development-branch/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "ui-cloner-synthesis",
+  "category": "ui-cloner",
+  "trigger_phrases": [
+    "synthesize replication prompt",
+    "run phase 3",
+    "generate build prompt",
+    "create replication prompt",
+    "synthesis step"
+  ],
+  "vault_paths": [".claude/skills/ui-cloner/ui-cloner-synthesis/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

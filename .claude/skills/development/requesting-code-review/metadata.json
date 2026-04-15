@@ -1,0 +1,9 @@
+{
+  "name": "requesting-code-review",
+  "category": "development",
+  "trigger_phrases": ["review my code", "pre-review check", "ready for review", "self-review", "before I open a PR"],
+  "vault_paths": [".claude/skills/development/requesting-code-review/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

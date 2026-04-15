@@ -1,0 +1,18 @@
+{
+  "name": "internal-comms",
+  "category": "writing",
+  "trigger_phrases": [
+    "write a status update",
+    "draft an announcement",
+    "3P update",
+    "internal newsletter",
+    "project status report",
+    "write an FAQ",
+    "all-hands summary",
+    "weekly update"
+  ],
+  "vault_paths": [".claude/skills/writing/internal-comms/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}

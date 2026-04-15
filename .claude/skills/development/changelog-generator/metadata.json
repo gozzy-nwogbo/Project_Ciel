@@ -1,0 +1,9 @@
+{
+  "name": "changelog-generator",
+  "category": "development",
+  "trigger_phrases": ["generate changelog", "write release notes", "summarize what changed", "CHANGELOG.md", "what changed since last release"],
+  "vault_paths": [".claude/skills/development/changelog-generator/SKILL.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-14",
+  "audit_status": "DRAFT"
+}
