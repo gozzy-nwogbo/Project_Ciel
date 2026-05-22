@@ -1,0 +1,10 @@
+{
+  "name": "indeed",
+  "category": "integrations",
+  "trigger_phrases": ["search jobs on indeed", "indeed jobs", "company reviews", "salary data", "job details", "what jobs match", "indeed resume"],
+  "vault_paths": [],
+  "primitives_required": ["P2", "P7"],
+  "last_eval_date": "2026-04-16",
+  "audit_status": "PASS",
+  "generated_by": "mcp2skill bridge"
+}

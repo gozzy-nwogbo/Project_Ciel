@@ -1,0 +1,9 @@
+{
+  "name": "meeting-debrief",
+  "category": "writing",
+  "trigger_phrases": ["debrief", "meeting notes", "process transcript", "brain dump", "ideas dump", "what did we discuss", "log this meeting"],
+  "vault_paths": ["04-reflections/voice-profile.md", "04-reflections/meeting-*.md", "01-projects/"],
+  "primitives_required": ["P2", "P7"],
+  "last_eval_date": "2026-04-16",
+  "audit_status": "PASS"
+}

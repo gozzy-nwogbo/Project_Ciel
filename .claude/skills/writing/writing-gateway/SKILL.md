@@ -15,7 +15,7 @@ Routes any writing request to the correct execution path (quick write or deep wr
 
 | Input | Required | Purpose |
 |---|---|---|
-| `03-reflections/voice-profile.md` | Yes | Authoritative voice reference for tone, rhythm, register, and calibration test |
+| `04-reflections/voice-profile.md` | Yes | Authoritative voice reference for tone, rhythm, register, and calibration test |
 | `02-knowledge/platform-rules.md` | Yes | Platform-specific constraints: length, hooks, CTAs, credibility killers |
 | User request | Yes | The writing task: what to write, for whom, on which platform |
 
@@ -42,7 +42,7 @@ Routes any writing request to the correct execution path (quick write or deep wr
 ## Path A: Quick Write
 
 **Steps:**
-1. Read `03-reflections/voice-profile.md`
+1. Read `04-reflections/voice-profile.md`
 2. Read `02-knowledge/platform-rules.md`
 3. Identify platform from request (LinkedIn, email, creative, essay, case study, Twitter/X)
 4. Extract relevant platform constraints from platform-rules.md for that platform
@@ -59,7 +59,7 @@ Routes any writing request to the correct execution path (quick write or deep wr
 ## Path B: Deep Write
 
 **Steps:**
-1. Read `03-reflections/voice-profile.md`
+1. Read `04-reflections/voice-profile.md`
 2. Read `02-knowledge/platform-rules.md`
 3. Identify platform from request
 4. Search vault (02-knowledge/, 00-inbox/, Open Brain semantic search) for relevant existing context

@@ -3,8 +3,8 @@
 > Check here before building anything new. If a skill exists, invoke it.
 > If a skill is missing, build it, then register it here before use.
 
-**Total registered skills:** 42
-**Last updated:** 2026-04-14
+**Total registered skills:** 54
+**Last updated:** 2026-04-29
 **Last audit run:** 2026-04-14 (Phase 5 Track A migration)
 
 ---
@@ -50,13 +50,15 @@
 
 ---
 
-## Writing (3 skills)
+## Writing (5 skills)
 
 | Skill | Trigger Phrases | Path | Audit | Last Eval |
 |-------|----------------|------|-------|-----------|
-| `writing-gateway` | "write", "draft", "LinkedIn post", "email draft", "article", "essay", "copy", "letter", "cold outreach" | .claude/skills/writing/writing-gateway/ | DRAFT | 2026-04-14 |
-| `content-research-writer` | "write an article", "research and write", "content piece" | .claude/skills/writing/content-research-writer/ | DRAFT | 2026-04-14 |
+| `writing-gateway` | "write", "draft", "LinkedIn post", "email draft", "article", "essay", "copy", "letter", "cold outreach" | .claude/skills/writing/writing-gateway/ | DRAFT | 2026-04-14 | Carry-forward: requires example-quick-write.md + test-basket.md to reach PASS. Defer to Phase 6 skill quality sprint. |
+| ~~`content-research-writer`~~ | ~~"write an article", "research and write", "content piece"~~ | ~~.claude/skills/writing/content-research-writer/~~ | ~~DRAFT~~ | ~~2026-04-14~~ | Superseded by `content-research` (2026-04-16) |
+| `content-research` | "research", "I watched a video", "Nate posted", "Cole posted", "writing research", "find me sources", "gap analysis", "what does this mean for my build" | .claude/skills/writing/content-research/ | **PASS** | 2026-04-16 |
 | `internal-comms` | "write a slack message", "internal announcement", "team update" | .claude/skills/writing/internal-comms/ | DRAFT | 2026-04-14 |
+| `meeting-debrief` | "debrief", "meeting notes", "process transcript", "brain dump", "ideas dump", "what did we discuss", "log this meeting" | .claude/skills/writing/meeting-debrief/ | **PASS** | 2026-04-16 |
 
 ---
 
@@ -70,7 +72,7 @@
 
 ---
 
-## Meta (5 skills)
+## Meta (13 skills)
 
 | Skill | Trigger Phrases | Path | Audit | Last Eval |
 |-------|----------------|------|-------|-----------|
@@ -79,23 +81,32 @@
 | `orchestrator` | "what's next in the pipeline", "pipeline status", "which stage" | .claude/skills/meta/orchestrator/ | **PASS** | 2026-04-14 |
 | `agent-harness` | "evaluate my agent harness", "audit this CLAUDE.md", "design the harness for" | .claude/skills/meta/agent-harness/ | DRAFT | 2026-04-14 |
 | `spec-contract` | "write a spec contract", "create spec for", "lock the spec" | .claude/skills/meta/spec-contract/ | DRAFT | 2026-04-14 |
+| `elicitation` | "interview me", "elicitation", "extract my knowledge", "help me figure out what I want", "provision a new agent", "pressure test idea" | .claude/skills/meta/elicitation/ | **PASS** | 2026-04-16 |
+| `rag-search` | "search", "find", "what do I know about", "find pattern", "have I seen this before", "search: expand", "recall", "surface" | .claude/skills/meta/rag-search/ | **PASS** | 2026-04-16 |
+| `prd-generator` | "new project", "I want to build", "generate a PRD", "spec this out", "I have an idea", "plan this project", "PRD for" | .claude/skills/meta/prd-generator/ | **PASS** | 2026-04-16 | Output: full-PRD / spec-contract / exploratory-route |
+| `mcp2skill` | "new integration", "wrap this MCP", "generate skill for", "I connected a new MCP", "build integration skill", "mcp2skill" | .claude/skills/meta/mcp2skill/ | **PASS** | 2026-04-16 | Generates integration skills from MCP servers |
+| `atom-promotion` | "promote atoms", "validate staging", "run promotion", "atom quality gate" | .claude/skills/meta/atom-promotion/ | DRAFT | 2026-04-25 | Validates and promotes staging atoms to 02-knowledge/ |
+| `humanizer` | "humanize this", "check for AI patterns", "does this sound like me", "voice check", "AI tells audit", "clean this up" | .claude/skills/meta/humanizer/ | DRAFT | 2026-04-28 | Multi-pass AI pattern removal with voice profile alignment |
+| `registry-audit` | "audit the skill registry", "check for skill drift", "registry audit", "verify registry", "find orphan skills" | .claude/skills/meta/registry-audit/ | **PASS** | 2026-04-29 | Detects drift between filesystem skills and registry index |
+| `supersede-skill` | "supersede this skill", "retire skill", "deprecate skill", "supersede [name] with [name]" | .claude/skills/meta/supersede-skill/ | DRAFT | 2026-04-29 | Atomic three-step supersession: registry strike-through + filesystem deletion + memory log |
 
 > **Always use `skill-creator` when adding to this registry.** It ensures consistent structure, evaluation criteria, and metadata.
 > **Run `skill-authoring` before any skill enters a pipeline.** It produces a binary PASS/DRAFT verdict against the V2 standard.
 
 ---
 
-## Integrations (3 skills)
+## Integrations (4 skills)
 
 | Skill | Trigger Phrases | Path | Audit | Last Eval |
 |-------|----------------|------|-------|-----------|
 | `gmail` | "check email", "read inbox", "draft reply", "gmail", "email" | .claude/skills/integrations/gmail/ | DRAFT | 2026-04-14 |
 | `google-calendar` | "calendar", "schedule", "meetings", "free time", "conflicts" | .claude/skills/integrations/google-calendar/ | DRAFT | 2026-04-14 |
 | `asana` | "tasks", "asana", "project tasks", "create task", "open brain tasks" | .claude/skills/integrations/asana/ | DRAFT | 2026-04-14 |
+| `indeed` | "search jobs on indeed", "indeed jobs", "company reviews", "salary data", "job details" | .claude/skills/integrations/indeed/ | **PASS** | 2026-04-16 | Generated by mcp2skill bridge |
 
 ---
 
-## n8n (7 skills)
+## n8n (8 skills)
 
 | Skill | Trigger Phrases | Path | Audit | Last Eval |
 |-------|----------------|------|-------|-----------|
@@ -106,6 +117,7 @@
 | `n8n-node-configuration` | "configure this node", "set up n8n node", "node settings" | .claude/skills/n8n/n8n-node-configuration/ | DRAFT | 2026-04-14 |
 | `n8n-validation-expert` | "validate workflow", "check n8n logic", "workflow QA" | .claude/skills/n8n/n8n-validation-expert/ | DRAFT | 2026-04-14 |
 | `n8n-workflow-patterns` | "build a workflow", "new n8n workflow", "automation pattern" | .claude/skills/n8n/n8n-workflow-patterns/ | DRAFT | 2026-04-14 |
+| `credential-pin` | "pin credentials", "snapshot n8n credentials", "restore credential bindings", "credential pin before push" | .claude/skills/n8n/credential-pin/ | DRAFT | 2026-04-29 |
 
 > **n8n standard patterns** (from CLAUDE.md):
 > - Agent workflow: `Trigger → Prepare Input → AI Agent → Chat Model → Output Parser → Format Output`

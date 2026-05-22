@@ -1,0 +1,9 @@
+{
+  "name": "prd-generator",
+  "category": "meta",
+  "trigger_phrases": ["new project", "I want to build", "generate a PRD", "spec this out", "I have an idea", "plan this project", "PRD for"],
+  "vault_paths": ["01-projects/", "01-projects/seeds/", ".claude/templates/spec-contract.md"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-16",
+  "audit_status": "PASS"
+}

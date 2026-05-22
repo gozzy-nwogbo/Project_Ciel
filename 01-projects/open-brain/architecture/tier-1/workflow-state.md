@@ -205,7 +205,7 @@ The key differences:
              ┌────────────┐
              │  writing    │
              └────┬───────┘
-                  │ review saved to 05-daily/ and promoted to memory
+                  │ review saved to 06-daily/ and promoted to memory
                   ▼
              ┌──────────────────┐
              │ awaiting_approval │
@@ -222,7 +222,7 @@ The key differences:
 | idle | Not running | Sunday cron fires | N/A |
 | collecting | Entry point called | Daily logs for the week read into memory | Safe. Read-only. |
 | analyzing | Logs collected | LLM produces structured review | Resume: re-analyze from collected logs |
-| writing | Review produced | Written to `05-daily/week-review-YYYY-WNN.md` | Resume: overwrite (single output file) |
+| writing | Review produced | Written to `06-daily/week-review-YYYY-WNN.md` | Resume: overwrite (single output file) |
 | awaiting_approval | Review written | Human confirms or workflow auto-completes after timeout | Resume: re-present review |
 | done | Approved or timed out | Run archived | N/A |
 

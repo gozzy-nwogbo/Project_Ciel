@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Session-end and pre-compact hook: summarizes conversation transcript
-and writes to 05-daily/YYYY-MM-DD.md using the Anthropic SDK.
+and writes to 06-daily/YYYY-MM-DD.md using the Anthropic SDK.
 
 The hook itself returns immediately. The API call runs in a detached
 background process so the hook never blocks on network I/O.
@@ -18,7 +18,7 @@ from datetime import datetime
 from importlib.machinery import SourceFileLoader
 
 VAULT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-DAILY_DIR = os.path.join(VAULT_DIR, "05-daily")
+DAILY_DIR = os.path.join(VAULT_DIR, "06-daily")
 LOG_FILE = os.path.join(VAULT_DIR, ".claude", "logs", "hook-debug.log")
 
 _event_log = SourceFileLoader(
