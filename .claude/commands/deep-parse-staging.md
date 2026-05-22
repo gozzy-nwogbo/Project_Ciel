@@ -83,7 +83,7 @@ rm -f .claude/reminders/deep-parse-due.md
 3. **No em-dashes, no AI watermarks** in atom prose (CLAUDE.md Section 3).
 4. **No forced extraction.** If a source has no durable insight, skip-with-note and archive. Do not invent atoms.
 5. **Permission logging.** Filesystem only — no MCP tool calls expected. If MCP tools are invoked, follow CLAUDE.md Section 15.
-6. **Atom format:** frontmatter (title, type, source_date, tags) + single-claim body 2-3 sentences. Match existing atoms in target folder.
+6. **Atom format:** YAML frontmatter per `.claude/standards/atom-front-matter.md` v2.0, lightweight atom pattern only. Required fields for concepts/frameworks/principles: `title`, `type` (default: `concept`), `source_date` (ISO 8601), `tags`. For connection atoms: replace `tags` with `from` and `to`. Body: 1-3 sentence single-claim, no section headings. Do not match existing folder formats — generate fresh per the standard regardless of what's already in the target folder.
 7. **Connection format:** frontmatter (title, type=connection, from, to, source_date) + "**From** -> **To**" arrow + 1-sentence relationship.
 
 ---
