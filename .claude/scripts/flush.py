@@ -4,7 +4,7 @@ Flush process: extracts concepts and connections from daily logs
 and raw inbox files, writes them to 02-knowledge/, and updates index.md.
 
 Two-pass processing:
-  1. Daily logs in 05-daily/ (extracted, marked with frontmatter flag)
+  1. Daily logs in 06-daily/ (extracted, marked with frontmatter flag)
   2. Raw inbox files in 00-inbox/raw/ (extracted, marked, moved to 00-inbox/staging/)
 
 Idempotent: marks processed files with a frontmatter flag so they
@@ -27,7 +27,7 @@ from datetime import datetime
 from importlib.machinery import SourceFileLoader
 
 VAULT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-DAILY_DIR = os.path.join(VAULT_DIR, "05-daily")
+DAILY_DIR = os.path.join(VAULT_DIR, "06-daily")
 INBOX_RAW = os.path.join(VAULT_DIR, "00-inbox", "raw")
 INBOX_STAGING = os.path.join(VAULT_DIR, "00-inbox", "staging")
 

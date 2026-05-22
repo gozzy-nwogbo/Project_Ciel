@@ -99,11 +99,30 @@ Configuration best practices:
 
 ---
 
+## Constraint: Native Node + Credential Check
+
+**Before building ANY node that calls an external service, run this check first:**
+
+| # | Check | Route |
+|---|---|---|
+| 1 | Native n8n node exists + credential installed | Build immediately with native node |
+| 2 | Native n8n node exists + no credential | STOP. Tell user what credential is needed and where to get it. Wait for confirmation. |
+| 3 | No native node + credential exists | HTTP Request using stored key |
+| 4 | No native node + no credential | STOP. Tell user an API key is required and where to get it. Wait for confirmation. |
+
+**Never build around a missing credential silently. Never default to HTTP Request when a native node is available.**
+
+How to check: run `search_nodes` for each external service, then verify credentials via a previous workflow's auto-assignment or ask the user.
+
+---
+
 ## Configuration Workflow
 
 ### Standard Process
 
 ```
+0. Run native node + credential check (see constraint above)
+   |
 1. Identify node type and operation
    |
 2. Use get_node (standard detail is default)

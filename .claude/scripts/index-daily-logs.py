@@ -2,7 +2,7 @@
 """
 SQLite FTS5 index for daily logs.
 
-Scans 05-daily/*.md, splits each file into session entries on '---'
+Scans 06-daily/*.md, splits each file into session entries on '---'
 separators, and indexes them into a SQLite database with full-text
 search. Idempotent via a manifest table that tracks indexed files
 by path and mtime.
@@ -21,7 +21,7 @@ import sys
 from datetime import datetime
 
 VAULT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-DAILY_DIR = os.path.join(VAULT_DIR, "05-daily")
+DAILY_DIR = os.path.join(VAULT_DIR, "06-daily")
 DB_PATH = os.path.join(VAULT_DIR, ".claude", "logs", "daily-index.db")
 
 
@@ -137,7 +137,7 @@ def parse_daily_log(filepath: str) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 def index_all(conn: sqlite3.Connection) -> int:
-    """Scan 05-daily/ and index new or modified files. Returns count indexed."""
+    """Scan 06-daily/ and index new or modified files. Returns count indexed."""
     if not os.path.isdir(DAILY_DIR):
         print(f"Daily directory not found: {DAILY_DIR}")
         return 0

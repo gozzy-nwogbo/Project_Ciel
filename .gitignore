@@ -1,14 +1,58 @@
-# Secrets
+# ============================================
+# Second Brain — .gitignore
+# Skeleton tracked, personal content ignored.
+# ============================================
+
+# --- Secrets & credentials ---
 .env
+.env.*
+*.env
 .mcp.json
 
-# Personal data (use .template versions as reference)
+# --- Personal content directories ---
+00-inbox/
+02-knowledge/
+03-reflections/
+04-reflections/
+06-daily/
+07-portfolio/
+09-system/
+
+# --- 01-projects: gitignore all except open-brain skeleton ---
+01-projects/*
+!01-projects/open-brain/
+01-projects/open-brain/*
+!01-projects/open-brain/architecture/
+!01-projects/open-brain/mcp-server/
+01-projects/.claude/
+
+# --- 05-daily: keep TEMPLATE.md tracked ---
+05-daily/*
+!05-daily/TEMPLATE.md
+
+# --- .claude operational state (not skeleton) ---
+.claude/logs/*.log
+.claude/logs/*.jsonl
+.claude/projects/
+.claude/reminders/
+.claude/state/
 .claude/user.md
 .claude/settings.json
-05-daily/2026-*.md
+.claude/settings.local.json
 
-# System
-.claude/logs/
+# --- Supabase CLI temp ---
+supabase/
+
+# --- Editor / OS ---
+.obsidian/
+*.canvas
 .DS_Store
+Thumbs.db
+
+# --- Build artifacts ---
 __pycache__/
 *.pyc
+.pytest_cache/
+node_modules/
+*.db
+*.sqlite

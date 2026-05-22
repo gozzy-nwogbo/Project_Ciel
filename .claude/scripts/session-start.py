@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Session start hook: loads memory layer files into Claude's context."""
+"""Session start hook: loads memory layer files into Claude's context.
+Also surfaces unresolved ACT NOW items older than 24h (Phase 6.2)."""
 
 import json
 import os
 import re
+import subprocess
 import sys
 from datetime import date
 
@@ -55,7 +57,7 @@ def main():
 
     # Voice evolution review check
     voice_review_msg = ""
-    voice_log_path = os.path.join(VAULT_DIR, "03-reflections", "voice-evolution-log.md")
+    voice_log_path = os.path.join(VAULT_DIR, "04-reflections", "voice-evolution-log.md")
     voice_log_content = read_file(voice_log_path)
     if voice_log_content not in ("(not found)", ""):
         # Parse the last row's Next Review Date (YYYY-MM-DD)
@@ -75,12 +77,73 @@ def main():
             except ValueError:
                 pass
 
+    # Staging reminder: surface deep-parse-due reminder if check-staging.py wrote one
+    staging_reminder_msg = ""
+    reminder_path = os.path.join(VAULT_DIR, ".claude", "reminders", "deep-parse-due.md")
+    reminder_content = read_file(reminder_path)
+    if reminder_content not in ("(not found)", ""):
+        staging_reminder_msg = (
+            f"\n\n--- staging deep-parse reminder ---\n{reminder_content}"
+        )
+
+    # ACT NOW: surface unresolved items older than 24h (Phase 6.2)
+    act_now_msg = ""
+    act_now_script = os.path.join(
+        VAULT_DIR, "01-projects", "open-brain", "scripts", "write_act_now.py"
+    )
+    if os.path.isfile(act_now_script):
+        try:
+            result = subprocess.run(
+                [sys.executable, act_now_script, "--query-stale"],
+                capture_output=True, text=True, timeout=10,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                items = json.loads(result.stdout)
+                if items:
+                    lines = []
+                    for i, item in enumerate(items, 1):
+                        priority = item.get("priority", "medium")
+                        text = item.get("item", "")
+                        source = item.get("source_session", "")
+                        lines.append(f"  {i}. [{priority}] {text} (from {source})")
+                    act_now_msg = (
+                        f"\n\n--- unresolved ACT NOW items ---\n"
+                        f"You have {len(items)} unresolved ACT NOW item(s) from previous sessions:\n"
+                        + "\n".join(lines)
+                    )
+        except Exception:
+            pass  # Non-blocking: if query fails, skip silently
+
+    # Permission log: write session_start entry (Phase 6.7)
+    log_permission_script = os.path.join(
+        VAULT_DIR, "01-projects", "open-brain", "scripts", "log_permission.py"
+    )
+    if os.path.isfile(log_permission_script):
+        try:
+            subprocess.run(
+                [
+                    sys.executable, log_permission_script,
+                    "--integration", "system",
+                    "--tool", "session_start",
+                    "--tier", "read-only",
+                    "--action", "session opened",
+                    "--inputs", "context files loaded, memory layer initialized",
+                    "--result", "success",
+                    "--reason", "session initialization — context loaded",
+                ],
+                capture_output=True, text=True, timeout=10,
+            )
+        except Exception:
+            pass  # Non-blocking: if permission log fails, skip silently
+
     if parts:
         message = (
             "=== MEMORY LAYER LOADED (session-start hook) ===\n\n"
             + "\n\n".join(parts)
             + f"\n\n--- token budget ---\n{budget_line}"
             + voice_review_msg
+            + staging_reminder_msg
+            + act_now_msg
             + "\n\n=== END MEMORY LAYER ==="
         )
     else:

@@ -2,7 +2,6 @@
 **Category:** meta
 **Variant:** anthropic (Claude Code)
 **Source:** Derived from Nate B. Jones / OB1 `n-agentic-harnesses`, adapted for this vault
-**Vault reference:** `02-knowledge/agent-primitives.md`
 
 ---
 
@@ -247,7 +246,7 @@ These apply regardless of what the user asks for:
 
 4. **Verification must be specific.** "It seems to work" is not a verification criterion. Every phase gate must have a named test with a specific expected behavior. Examples: "destructive tools always require approval," "when token budget is exceeded, agent stops with structured reason before API call."
 
-5. **Log findings to the vault.** When Evaluation Mode or Retrospective Mode produces findings, offer to write the output to `03-reflections/harness-audit-[date].md` in the vault. Architectural findings that aren't captured compound into invisible debt.
+5. **Log findings to the vault.** When Evaluation Mode or Retrospective Mode produces findings, offer to write the output to `04-reflections/harness-audit-[date].md` in the vault. Architectural findings that aren't captured compound into invisible debt.
 
 ---
 
@@ -257,8 +256,6 @@ This skill is most powerful when findings are written back to the vault.
 
 **After Design Mode:** Write the architecture plan to `00-inbox/staging/agent-design-[name]-[date].md`
 
-**After Evaluation Mode:** Write findings to `03-reflections/harness-audit-[date].md`
+**After Evaluation Mode:** Write findings to `04-reflections/harness-audit-[date].md`
 
-**After Retrospective Mode:** Write the gate check to `03-reflections/phase-[N]-retrospective-[date].md` and update the PRD phase status.
-
-**Knowledge reference:** `02-knowledge/agent-primitives.md`, the living reference for the 12 primitives as they evolve in this system. This skill reads from it; findings from evaluations update it.
+**After Retrospective Mode:** Write the gate check to `04-reflections/phase-[N]-retrospective-[date].md` and update the PRD phase status.

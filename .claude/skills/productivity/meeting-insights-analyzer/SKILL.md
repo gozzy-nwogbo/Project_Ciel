@@ -2,7 +2,7 @@
 
 Analyze meeting transcripts for behavioral patterns (speaking ratios, conflict avoidance, filler words, leadership dynamics, decision quality) beyond simple summaries.
 Trigger phrases: "analyze this meeting", "meeting insights", "review this transcript", "meeting dynamics", "who talked the most".
-Output artifact: meeting analysis report at `01-projects/[project]/output/writing/meeting-analysis-[date].md`.
+Output artifact: meeting analysis report at `04-reflections/meeting-analysis-[YYYY-MM-DD]-[title].md`.
 
 ---
 

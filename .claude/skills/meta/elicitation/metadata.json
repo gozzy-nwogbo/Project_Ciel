@@ -1,0 +1,9 @@
+{
+  "name": "elicitation",
+  "category": "meta",
+  "trigger_phrases": ["interview me", "elicitation", "help me figure out what I actually want", "run the elicitation", "extract my knowledge about", "I have a new project idea", "pressure test this idea"],
+  "vault_paths": ["04-reflections/elicitation-*.md", ".claude/user.md", ".claude/soul.md", "01-projects/seeds/"],
+  "primitives_required": [],
+  "last_eval_date": "2026-04-16",
+  "audit_status": "PASS"
+}

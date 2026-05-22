@@ -1,0 +1,22 @@
+{
+  "name": "rag-search",
+  "category": "meta",
+  "trigger_phrases": [
+    "search",
+    "find",
+    "what do I know about",
+    "find pattern",
+    "have I seen this before",
+    "search: expand",
+    "recall",
+    "surface"
+  ],
+  "vault_paths": [
+    "04-reflections/",
+    "06-daily/",
+    "02-knowledge/"
+  ],
+  "primitives_required": ["P7", "P9"],
+  "last_eval_date": "2026-04-16",
+  "audit_status": "PASS"
+}

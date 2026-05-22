@@ -1,0 +1,9 @@
+{
+  "name": "mcp2skill",
+  "category": "meta",
+  "trigger_phrases": ["new integration", "wrap this MCP", "generate skill for", "I connected a new MCP", "build integration skill", "mcp2skill"],
+  "vault_paths": ["02-knowledge/mcp-tool-audit.md", ".claude/skills/integrations/"],
+  "primitives_required": ["P2", "P7", "P9"],
+  "last_eval_date": "2026-04-16",
+  "audit_status": "PASS"
+}

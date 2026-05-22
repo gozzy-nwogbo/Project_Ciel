@@ -1,0 +1,23 @@
+{
+  "name": "content-research",
+  "category": "writing",
+  "trigger_phrases": [
+    "research",
+    "I watched a video",
+    "Nate posted",
+    "Cole posted",
+    "writing research",
+    "find me sources",
+    "gap analysis",
+    "what does this mean for my build"
+  ],
+  "vault_paths": [
+    "02-knowledge/trusted-creators.md",
+    "04-reflections/voice-profile.md",
+    "04-reflections/research-*.md",
+    "01-projects/seeds/"
+  ],
+  "primitives_required": ["P7", "P9"],
+  "last_eval_date": "2026-04-16",
+  "audit_status": "PASS"
+}

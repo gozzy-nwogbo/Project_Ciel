@@ -4,18 +4,18 @@
 
 This is a personal AI infrastructure system built on top of Claude Code, Supabase (pgvector), n8n, and an Obsidian-style vault. It captures thoughts, compiles knowledge, searches semantically, and writes in a voice that's actually mine.
 
-Not a product. Not a template. Personal infrastructure, built once, maintained incrementally, compounding in value over time.
+Personal infrastructure. Built once, maintained over time, and it gets more useful the longer it runs.
 
 ---
 
 ## What It Does
 
-- **Captures** raw thoughts via Telegram bot, classifies them with Claude Haiku, routes them to the right table in Supabase
-- **Compiles** daily logs and raw captures into a structured wiki with concepts, connections, and an auto-maintained index
-- **Searches** by meaning, not keywords, using pgvector semantic search via a custom MCP server
-- **Writes** in a calibrated personal voice using a voice profile built from real interviews and writing samples
-- **Integrates** with Gmail (read + draft), Google Calendar (read), and Asana (read + scoped write) through MCP tools
-- **Audits itself** with a 9-criterion skill evaluation standard and harness tests for every configuration change
+- A Telegram bot captures raw thoughts. Claude Haiku classifies each one and routes it to the right Supabase table.
+- Daily logs and captures compile into a structured wiki: concepts, connections, and an auto-maintained index. The knowledge layer compounds on its own.
+- Search is semantic. A custom MCP server runs pgvector across everything the system has stored, so you query by meaning instead of guessing at keywords.
+- Writing goes through a voice profile built from real interviews and writing samples. Two paths: quick (LinkedIn, email, outreach) and deep (essays, narratives, briefs).
+- Gmail, Google Calendar, and Asana connect via MCP. Read access on all three; write access only where deliberately approved.
+- Skills are evaluated against a 9-criterion standard, and config changes run harness tests. The system audits itself so you don't carry that overhead.
 
 ## Architecture
 
@@ -25,15 +25,15 @@ Vault (files)          Supabase (database)         n8n (automation)
     +--- CLAUDE.md          +--- captures               +--- Telegram capture
     +--- .claude/skills/    +--- people                 +--- Classification
     +--- 02-knowledge/      +--- projects               +--- Routing
-    +--- 05-daily/          +--- ideas                  +--- Reply
+    +--- 06-daily/          +--- ideas                  +--- Reply
     |                       |
     +----------- MCP Server (semantic_search, write, list_recent, stats)
 ```
 
 Three layers, always:
-1. **Directives** — SOPs, behavioral rules, decision criteria
-2. **Orchestration** — agent coordination, routing, decisions
-3. **Execution** — deterministic scripts, API calls, output formatting
+1. **Directives:** SOPs, behavioral rules, decision criteria
+2. **Orchestration:** agent coordination, routing, decisions
+3. **Execution:** deterministic scripts, API calls, output formatting
 
 ## Design Philosophy
 
@@ -58,8 +58,8 @@ Every new integration starts read-only. Write access is added deliberately. Ever
 
 The writing system uses a voice profile built from real interviews and writing samples. It has two paths:
 
-- **Quick write** — short-form output (LinkedIn, email, cold outreach) produced directly in session
-- **Deep write** — long-form output (articles, essays, narratives) routed through a writing brief pipeline
+- **Quick write:** short-form output (LinkedIn, email, cold outreach) produced directly in session
+- **Deep write:** long-form output (articles, essays, narratives) routed through a writing brief pipeline
 
 Platform rules for 6 platforms. Personal voice only. No generic AI output.
 
@@ -78,4 +78,4 @@ Platform rules for 6 platforms. Personal voice only. No generic AI output.
 
 ---
 
-*Built by Gozzy. Not a template, but if it makes you think about building your own, that was the point.*
+*Built by Gozzy. If it makes you think about building your own, good.*

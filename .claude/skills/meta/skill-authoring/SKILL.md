@@ -127,6 +127,7 @@ _Evaluated: [date] | Standard: skill-authoring v1_
 3. **Skill has a test section inline but no separate test basket file:** FAIL on C9. Test basket must be a separate file so it can be run independently of reading the skill.
 4. **Description is one line but is vague ("does design stuff"):** FAIL on C1. The line must contain trigger context and output artifact name, not just a category.
 5. **Constraints use "should" or "ideally":** FAIL on C4. Every constraint must be binary. "Should" is not binary.
+6. **Review pattern for generated artifacts:** Always use "show diff → review → correct → re-show diff → approve → apply" rather than "propose and apply". Single-step approval consistently misses real issues. This applies to spec contracts, skill files, n8n workflows.
 
 ---
 
