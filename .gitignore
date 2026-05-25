@@ -57,6 +57,9 @@
 # --- Supabase CLI temp ---
 supabase/
 
+# --- Brainstorming companion runtime ---
+.superpowers/
+
 # --- Editor / OS ---
 .obsidian/
 *.canvas
