@@ -47,6 +47,7 @@ class PostBrief:
     text_constraints: TextConstraints = field(default_factory=TextConstraints)
     draft_text: str = ""
     approved_text: str = ""
+    thesis: str = ""
     edit_delta: Optional[dict[str, Any]] = None
     visual_brief: dict[str, Any] = field(default_factory=dict)
     visual_asset_paths: list[str] = field(default_factory=list)
@@ -88,6 +89,7 @@ class PostBrief:
             text_constraints=constraints,
             draft_text=d.get("draft_text", ""),
             approved_text=d.get("approved_text", ""),
+            thesis=d.get("thesis", ""),
             edit_delta=d.get("edit_delta"),
             visual_brief=d.get("visual_brief", {}),
             visual_asset_paths=d.get("visual_asset_paths", []),
