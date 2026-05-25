@@ -49,6 +49,7 @@ Connections use `from`/`to` instead of `tags`.
 | `origin` | string | Creator and approximate year | NotebookLM-origin atoms |
 | `sources` | list of strings | Source books or materials | NotebookLM-origin atoms |
 | `notebooklm_notebook` | string | Name of the NotebookLM notebook containing source material | NotebookLM-origin atoms |
+| `connection_type` | enum | Type of relationship (see §Connection types). Optional; defaults to `general`. | `connection_type: mechanism` |
 
 Optional fields are omitted when not applicable. Do not populate with empty strings or placeholder values.
 
@@ -230,3 +231,24 @@ Derivation fields (`derived_from`, `perspective`, `derivation_type`, `warrant`, 
 |---------|------|--------|
 | 1.0 | 2026-04-24 | Initial standard. Inline-bold metadata format. |
 | 2.0 | 2026-05-22 | YAML frontmatter as sole canonical format. Inline-bold retired. D-rules rewritten for YAML (D1-D7). Body section enforcement removed; two body patterns documented (lightweight + structured). Soft-flag mechanism added. Optional fields added for NotebookLM-origin provenance. |
+
+---
+
+## Connection types (v2.1)
+
+Connection atoms may include an optional `connection_type` field. Value is one of:
+
+| Type | Meaning |
+|---|---|
+| `mechanism` | Both endpoints implement the same underlying mechanism |
+| `analogical` | Different domains, structurally similar |
+| `causal` | One sets up or produces the other |
+| `inverse` | Opposites in a meaningful way |
+| `compositional` | One is a part of the other / they compose |
+| `genealogical` | One historically came from the other |
+| `critique` | One refines or pushes against the other |
+| `epistemic` | Same thing seen from different ways of knowing |
+| `general` | Untyped (default for legacy and unclassified) |
+
+Migration: no breaking change. Legacy connection atoms with no `connection_type`
+field are treated as `general`. New connections should declare a type.
