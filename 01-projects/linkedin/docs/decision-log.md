@@ -76,3 +76,39 @@ Atoms chosen: Chain-Link Systems, Four Hallmarks of Bad Strategy, Design-Type St
 
 None of these block merging v1.0 if the goal is "ship the engine, iterate on output quality." If the goal is "ship something I'd actually post," (1) and (2) need to land first.
 
+---
+
+## 2026-05-25 — v1.0.1 patches landed (in-branch)
+
+User chose Option 1 (patch then ship). Two surgical fixes committed on `feat/linkedin-engine-v1.0`:
+
+**Patch A — cold-reader anchor (commit 9823c39):**
+Added a `COLD READER ANCHOR` section to `VOICE_SYSTEM_PROMPT` in `src/text_generator.py`. Requires the model to (a) place source authors in 3-5 words on first reference, (b) anchor named concepts with a 5-to-8-word inline definition the first time they appear, (c) assume the reader has not been following prior posts.
+
+**Patch B — edgeless Tier 1 guard (commit e38e6ff):**
+`DiagramRenderer.validate` now flags bundles where no `type: connection` atom exists among `atoms_used` as "edgeless diagram." CLI `_advance` catches the flag and advances the bundle to gate2_pending with `visual_asset_paths=[]` and a stderr warning. `--force` overrides if user wants the floating-nodes render anyway.
+
+**Tests:** 39/39 pass. New tests: `test_validate_rejects_edgeless_tier1`, added "anchor" assertion to `test_voice_rules_in_system_prompt`.
+
+**Re-smoke needed (user-run, hits Anthropic API):**
+
+```bash
+# 1. Generate (will use atoms not in cooldown from first smoke run)
+cd /Users/gozzynwogbo/second-brain/01-projects/linkedin && \
+PYTHONPATH=src \
+LINKEDIN_ATOM_SOURCE=/Users/gozzynwogbo/second-brain/02-knowledge \
+LINKEDIN_PROJECT_ROOT=/Users/gozzynwogbo/second-brain/01-projects/linkedin \
+LINKEDIN_BRAND_SPEC=/Users/gozzynwogbo/second-brain/01-projects/linkedin/brand-spec.md \
+python3 -m cli.draft_post --strategy=source_spotlight --source='Richard Rumelt, 2011' --no-render
+
+# 2. Advance — should now warn "edgeless" and skip the diagram if no connections exist
+PYTHONPATH=src \
+LINKEDIN_ATOM_SOURCE=/Users/gozzynwogbo/second-brain/02-knowledge \
+LINKEDIN_PROJECT_ROOT=/Users/gozzynwogbo/second-brain/01-projects/linkedin \
+LINKEDIN_BRAND_SPEC=/Users/gozzynwogbo/second-brain/01-projects/linkedin/brand-spec.md \
+python3 -m cli.draft_post --advance <new-slug>
+```
+
+Expected: post text now includes inline anchors for Rumelt and the concept names; advance prints "WARNING: Tier 1 diagram skipped" because the new Rumelt atoms also have no connection atoms among them. Result: a shippable text post, no broken diagram.
+
+
