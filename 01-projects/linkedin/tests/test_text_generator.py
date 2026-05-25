@@ -49,3 +49,67 @@ def test_voice_rules_in_system_prompt(atom_source, mocker):
     # Cold-reader anchor rule: the prompt must require inline definitions
     # for unfamiliar concepts. Surfaced in the v1.0 smoke (2026-05-25).
     assert "anchor" in system.lower() or "first time" in system.lower() or "cold reader" in system.lower()
+
+
+def test_voice_prompt_v2_thesis_requirement():
+    """System prompt requires exactly one <THESIS>...</THESIS> block."""
+    from text_generator import VOICE_SYSTEM_PROMPT
+    assert "<THESIS>" in VOICE_SYSTEM_PROMPT
+    assert "</THESIS>" in VOICE_SYSTEM_PROMPT
+    assert "exactly one" in VOICE_SYSTEM_PROMPT.lower()
+
+
+def test_voice_prompt_v2_source_type_aware_anchor():
+    """COLD READER ANCHOR rule mentions source type differentiation."""
+    from text_generator import VOICE_SYSTEM_PROMPT
+    assert "book" in VOICE_SYSTEM_PROMPT.lower()
+    assert "video" in VOICE_SYSTEM_PROMPT.lower() or "podcast" in VOICE_SYSTEM_PROMPT.lower()
+    assert "author_bio" in VOICE_SYSTEM_PROMPT or "bio" in VOICE_SYSTEM_PROMPT.lower()
+
+
+def test_generate_extracts_thesis_and_strips_tags(tmp_path):
+    """generate() populates brief.thesis and strips tags from draft_text."""
+    from datetime import datetime, timezone
+    from unittest.mock import MagicMock
+
+    from atom_loader import AtomLoader
+    from models import AtomRef, PostBrief, Status
+    from text_generator import TextGenerator
+
+    atom_file = tmp_path / "atom-a.md"
+    atom_file.write_text(
+        "---\ntitle: Atom A\ntype: concept\nsource: Test, 2026\ndomain: test\ntags: []\n---\n\nBody.\n"
+    )
+
+    loader = AtomLoader(tmp_path)
+
+    fake_client = MagicMock()
+    fake_response = MagicMock()
+    fake_response.content = [MagicMock(text=(
+        "Opening line.\n\n"
+        "<THESIS>The locked thesis sentence.</THESIS>\n\n"
+        "Closing line."
+    ))]
+    fake_client.messages.create.return_value = fake_response
+
+    now = datetime.now(timezone.utc)
+    brief = PostBrief(
+        id="b1",
+        slug="thesis-extract-test",
+        created_at=now,
+        updated_at=now,
+        strategy="source_spotlight",
+        strategy_params={},
+        atoms_used=[AtomRef(slug="atom-a", role="primary")],
+        angle="An angle.",
+        visual_tier="1_diagram",
+        status=Status.DRAFTING,
+    )
+
+    gen = TextGenerator(client=fake_client, loader=loader)
+    result = gen.generate(brief)
+
+    assert result.thesis == "The locked thesis sentence."
+    assert "<THESIS>" not in result.draft_text
+    assert "</THESIS>" not in result.draft_text
+    assert "The locked thesis sentence." in result.draft_text
