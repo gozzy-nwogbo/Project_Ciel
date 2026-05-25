@@ -56,7 +56,10 @@ class TwoAtomBridge:
                 AtomRef(slug=slug_b, role="primary"),
             ],
             angle=angle,
-            visual_tier="1_diagram",
+            # Two-atom bridges default to text-only: a 2-node graphviz render
+            # never adds information the sentence didn't already carry.
+            # Override with --tier=1 to force a diagram when you genuinely want one.
+            visual_tier="0_text",
             status=Status.DRAFTING,
             topic_tags=sorted(set(atom_a.tags + atom_b.tags)),
         )
