@@ -18,13 +18,28 @@
 07-portfolio/
 09-system/
 
-# --- 01-projects: gitignore all except open-brain skeleton ---
+# --- 01-projects: gitignore all except whitelisted skeletons ---
 01-projects/*
 !01-projects/open-brain/
 01-projects/open-brain/*
 !01-projects/open-brain/architecture/
 !01-projects/open-brain/mcp-server/
 01-projects/.claude/
+
+# --- 01-projects/linkedin: whitelist code + docs; ignore runtime data ---
+!01-projects/linkedin/
+01-projects/linkedin/*
+!01-projects/linkedin/src/
+!01-projects/linkedin/tests/
+!01-projects/linkedin/docs/
+!01-projects/linkedin/CLAUDE.md
+!01-projects/linkedin/brand-spec.md
+!01-projects/linkedin/pyproject.toml
+!01-projects/linkedin/requirements.txt
+!01-projects/linkedin/requirements-dev.txt
+01-projects/linkedin/backlog/
+01-projects/linkedin/state/
+01-projects/linkedin/logs/
 
 # --- 05-daily: keep TEMPLATE.md tracked ---
 05-daily/*
