@@ -17,13 +17,14 @@ def test_full_pipeline_two_atom_bridge(atom_source, project_root, brand_spec, mo
     mock_anthropic.messages.create.return_value = MagicMock(
         content=[MagicMock(text=(
             "Built a small engine this week that picks two atoms from my second brain "
-            "and asks where they overlap. Surfaced a tie between feedback loops in "
-            "auth design and feedback loops in pedagogy. Same gear, different machines. "
+            "and asks where they overlap. <THESIS>Same gear runs in different machines.</THESIS> "
+            "Surfaced a tie between feedback loops in auth design and feedback loops in pedagogy. "
             "Wondering what other domains the same gear runs in. " * 2
         ))]
     )
 
-    with patch("cli.draft_post._make_anthropic_client", return_value=mock_anthropic):
+    with patch("cli.draft_post._make_anthropic_client", return_value=mock_anthropic), \
+         patch("anthropic.Anthropic", return_value=mock_anthropic):
         # 1. Generate
         rc = draft_post_main([
             "--strategy=two_atom_bridge",
@@ -41,14 +42,14 @@ def test_full_pipeline_two_atom_bridge(atom_source, project_root, brand_spec, mo
         assert (project_root / "backlog" / bundle_slug / "text.md").exists()
 
         # 3. Advance through Gate 1.
-        # two_atom_bridge defaults to visual_tier="0_text" (v1.0.2 change),
-        # so no diagram is rendered and visual_asset_paths stays empty.
+        # v1.1: two_atom_bridge defaults to 1_diagram (atom-card renderer);
+        # PNG is written to the bundle.
         rc = draft_post_main(["--advance", bundle_slug])
         assert rc == 0
 
         brief = storage.read(bundle_slug)
         assert brief.status is Status.GATE2_PENDING
-        assert brief.visual_asset_paths == []
+        assert any(p.endswith(".png") for p in brief.visual_asset_paths)
 
         # 4. Approvals log has an entry with edit_delta
         approvals_path = project_root / "state" / "approvals.jsonl"
