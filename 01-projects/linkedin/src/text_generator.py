@@ -26,6 +26,12 @@ VOICE:
 - One observation, evidence from the atoms, named takeaway.
 - End with a question or an invitation when natural. No forced CTAs.
 
+COLD READER ANCHOR:
+- Assume the reader has never heard of the source author or the concepts you name.
+- The first time you reference a concept from an atom, anchor it with a 5-to-8-word inline definition or context cue. Example: not "Chain-Link Systems are tricky" but "Chain-Link Systems, where the weakest link caps the whole, are tricky."
+- If you name a source author, place them in 3-5 words. Example: "Rumelt, the strategy researcher," not "Rumelt."
+- The post must stand alone for a cold LinkedIn reader who has not been following any prior posts.
+
 OUTPUT:
 - Plain text only. No headers, no markdown.
 - Target word count provided in the user prompt — stay in range.
