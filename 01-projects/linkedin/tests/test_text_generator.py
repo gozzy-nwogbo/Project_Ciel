@@ -46,3 +46,6 @@ def test_voice_rules_in_system_prompt(atom_source, mocker):
     system = call_kwargs.get("system", "")
     assert "em-dash" in system.lower() or "no em" in system.lower()
     assert "contrastive" in system.lower() or "not as x" in system.lower()
+    # Cold-reader anchor rule: the prompt must require inline definitions
+    # for unfamiliar concepts. Surfaced in the v1.0 smoke (2026-05-25).
+    assert "anchor" in system.lower() or "first time" in system.lower() or "cold reader" in system.lower()
