@@ -41,6 +41,13 @@ python -m linkedin_engine.cli.linkedin_status [args]
 
 The slash commands at `.claude/commands/draft-post.md` and `.claude/commands/linkedin-status.md` wrap these.
 
+## One-time install
+
+After `pip install -r requirements.txt`, install the Chromium binary
+Playwright uses for the Tier 1 renderer:
+
+    python -m playwright install chromium
+
 ## Testing
 
 ```
