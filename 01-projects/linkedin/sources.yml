@@ -1,0 +1,27 @@
+# Source registry — keyed by atom `source:` slug.
+# Fields:
+#   type:        book | video | podcast | post   (required)
+#   author_bio:  single sentence describing the author    (required for book)
+#   work:        title of the source work        (optional)
+#
+# Voice prompt uses `type` to choose between full-bio anchoring (book)
+# and 3-5 word descriptor anchoring (video/podcast/post). Missing entries
+# fall back to 3-5 word anchor with a logged warning.
+
+"Richard Rumelt, 2011":
+  type: book
+  author_bio: "UCLA strategy professor and author of Good Strategy / Bad Strategy"
+  work: "Good Strategy / Bad Strategy"
+
+"Daniel Kahneman, 2011":
+  type: book
+  author_bio: "Princeton psychologist, Nobel laureate, author of Thinking Fast and Slow"
+  work: "Thinking Fast and Slow"
+
+"Charlie Munger, 1994":
+  type: book
+  author_bio: "Berkshire Hathaway vice-chair, author of Poor Charlie's Almanack"
+  work: "Poor Charlie's Almanack"
+
+"Anonymous":
+  type: post
