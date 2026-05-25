@@ -40,6 +40,18 @@ class DiagramRenderer:
             errors.append(f"Diagram cannot have more than 6 nodes (got {n})")
         if n < 1:
             errors.append("Diagram needs at least 1 node")
+        if n >= 2:
+            slugs = {ref.slug for ref in brief.atoms_used}
+            edges_in_subgraph = [
+                e for e in self.graph.edges
+                if e.from_slug in slugs and e.to_slug in slugs
+            ]
+            if not edges_in_subgraph:
+                errors.append(
+                    "Edgeless diagram: no connection atoms exist among the chosen "
+                    f"{n} atoms. Floating nodes are not shippable; choose a different "
+                    "strategy, add connection atoms, or skip the Tier 1 visual."
+                )
         return errors
 
     def render(self, brief: PostBrief, out_dir: Path) -> RenderResult:

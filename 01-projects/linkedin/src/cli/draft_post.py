@@ -156,11 +156,27 @@ def _advance(slug: str, project_root: Path, brand_spec: Path, atom_source: Path,
         graph = ConnectionGraph(loader.load_all())
         renderer = DiagramRenderer(loader=loader, graph=graph, brand_spec_path=brand_spec)
         out_dir = project_root / "backlog" / slug
-        result = renderer.render(brief, out_dir)
-        brief.visual_asset_paths = [str(p) for p in result.asset_paths]
-        brief.status = Status.GATE2_PENDING
-        storage.write(brief)
-        state_log.record(slug, "gate1_approved", "gate2_pending", actor="engine")
+        validation_errors = renderer.validate(brief)
+        edgeless = any("edgeless" in e.lower() for e in validation_errors)
+        if edgeless and not args.force:
+            print(
+                "WARNING: Tier 1 diagram skipped — no connection atoms exist among the chosen atoms.",
+                file=sys.stderr,
+            )
+            print(
+                "  Bundle advanced to gate2_pending without a visual. Use --force to render anyway.",
+                file=sys.stderr,
+            )
+            brief.visual_asset_paths = []
+            brief.status = Status.GATE2_PENDING
+            storage.write(brief)
+            state_log.record(slug, "gate1_approved", "gate2_pending", actor="engine", note="edgeless_tier1_skipped")
+        else:
+            result = renderer.render(brief, out_dir)
+            brief.visual_asset_paths = [str(p) for p in result.asset_paths]
+            brief.status = Status.GATE2_PENDING
+            storage.write(brief)
+            state_log.record(slug, "gate1_approved", "gate2_pending", actor="engine")
 
     AtomUsageTracker(project_root / "state" / "atom-usage.json").mark_used(
         atom_slug=brief.atoms_used[0].slug, role="primary", post_id=brief.id
