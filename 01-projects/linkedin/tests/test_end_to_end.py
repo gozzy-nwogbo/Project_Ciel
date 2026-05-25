@@ -40,13 +40,15 @@ def test_full_pipeline_two_atom_bridge(atom_source, project_root, brand_spec, mo
         assert brief.status is Status.TEXT_READY
         assert (project_root / "backlog" / bundle_slug / "text.md").exists()
 
-        # 3. Advance through Gate 1 (renders the diagram)
+        # 3. Advance through Gate 1.
+        # two_atom_bridge defaults to visual_tier="0_text" (v1.0.2 change),
+        # so no diagram is rendered and visual_asset_paths stays empty.
         rc = draft_post_main(["--advance", bundle_slug])
         assert rc == 0
 
         brief = storage.read(bundle_slug)
         assert brief.status is Status.GATE2_PENDING
-        assert any(Path(p).exists() for p in brief.visual_asset_paths)
+        assert brief.visual_asset_paths == []
 
         # 4. Approvals log has an entry with edit_delta
         approvals_path = project_root / "state" / "approvals.jsonl"

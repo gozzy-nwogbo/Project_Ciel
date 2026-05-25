@@ -177,6 +177,12 @@ def _advance(slug: str, project_root: Path, brand_spec: Path, atom_source: Path,
             brief.status = Status.GATE2_PENDING
             storage.write(brief)
             state_log.record(slug, "gate1_approved", "gate2_pending", actor="engine")
+    else:
+        # Text-only tiers (0_text, etc.) skip rendering and advance directly to Gate 2.
+        brief.visual_asset_paths = []
+        brief.status = Status.GATE2_PENDING
+        storage.write(brief)
+        state_log.record(slug, "gate1_approved", "gate2_pending", actor="engine", note=f"text_only_tier_{brief.visual_tier}")
 
     AtomUsageTracker(project_root / "state" / "atom-usage.json").mark_used(
         atom_slug=brief.atoms_used[0].slug, role="primary", post_id=brief.id
