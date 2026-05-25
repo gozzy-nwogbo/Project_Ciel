@@ -20,6 +20,7 @@ When the user types `/draft-post [args]`:
 
    ```bash
    cd /Users/gozzynwogbo/second-brain/01-projects/linkedin && \
+   PYTHONPATH=src \
    LINKEDIN_ATOM_SOURCE=/Users/gozzynwogbo/second-brain/02-knowledge \
    LINKEDIN_PROJECT_ROOT=/Users/gozzynwogbo/second-brain/01-projects/linkedin \
    LINKEDIN_BRAND_SPEC=/Users/gozzynwogbo/second-brain/01-projects/linkedin/brand-spec.md \
