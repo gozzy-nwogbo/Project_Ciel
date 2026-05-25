@@ -45,3 +45,21 @@ def test_validate_rejects_too_many_nodes(atom_source, project_root, brand_spec):
     brief.atoms_used = [AtomRef(slug=f"atom{i}", role="primary") for i in range(7)]
     errors = renderer.validate(brief)
     assert any("more than 6 nodes" in e.lower() for e in errors)
+
+
+def test_validate_rejects_edgeless_tier1(atom_source, project_root, brand_spec):
+    """Tier 1 diagrams must have at least one edge among chosen atoms.
+    Surfaced by v1.0 smoke (2026-05-25) — source_spotlight picked 3 Rumelt
+    atoms with no connection atoms between them, producing 3 floating ovals."""
+    loader = AtomLoader(atom_source)
+    graph = ConnectionGraph(loader.load_all())
+    renderer = DiagramRenderer(loader=loader, graph=graph, brand_spec_path=brand_spec)
+    brief = _brief()
+    # Replace atoms_used with atoms that have NO connection atoms among them.
+    brief.atoms_used = [
+        AtomRef(slug="security-trust", role="primary"),
+        AtomRef(slug="law-trust", role="primary"),
+        AtomRef(slug="child-trust", role="primary"),
+    ]
+    errors = renderer.validate(brief)
+    assert any("no edges" in e.lower() or "edgeless" in e.lower() for e in errors)
