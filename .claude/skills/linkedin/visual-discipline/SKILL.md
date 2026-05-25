@@ -1,0 +1,94 @@
+---
+name: linkedin-visual-discipline
+description: Use when rendering or reviewing LinkedIn post visuals (atom-graph diagrams, carousels, video). Enforces brand-spec consultation and anti-pattern checks. Triggers on `render visual`, `tier 1 diagram`, `review carousel`, `visual brief`, LinkedIn post bundle preparation.
+when_to_use: Before any visual asset is committed to a LinkedIn post bundle. Also when reviewing an existing bundle for ship-readiness.
+allowed-tools: Read, Bash, Glob
+version: 1.0
+scope: project
+---
+
+# LinkedIn Visual Discipline
+
+## Purpose
+
+Enforces visual quality discipline across LinkedIn post bundles. Two responsibilities:
+
+1. **Brand-spec consultation.** No visual is allowed to drift from `01-projects/linkedin/brand-spec.md`. If the brand-spec changes, all subsequent renders adopt the change automatically.
+2. **Anti-pattern enforcement.** Deterministic checks that block ship-readiness when violated.
+
+## Trigger conditions
+
+Fire automatically when:
+- A renderer is about to write a visual asset to a backlog bundle.
+- A `gate2_pending` bundle is being reviewed.
+- User says "render the diagram", "make the carousel", "review the bundle".
+
+## Required inputs
+
+- `brief`: a PostBrief object (or its meta.json on disk).
+- `brand_spec_path`: path to brand-spec.md (default: `01-projects/linkedin/brand-spec.md`).
+- `bundle_dir`: target output directory.
+
+## Protocol
+
+1. **Load brand-spec.** Parse the YAML block. If missing or unparseable, halt and surface error.
+2. **Validate brief against tier rules:**
+   - Tier 1: ≤6 nodes, every node has ≥1 edge, aspect ratio 1:1 or 4:5.
+   - Tier 2: ≤8 slides, ≤50 words/slide, ≤9 augmented images.
+   - Tier 3: ≤12 total asset refs, ≤15s duration, 720p, body text always present.
+3. **Run anti-pattern checks:**
+   - No center-radial-gradient backgrounds.
+   - No drop shadows on graph nodes.
+   - No all-caps body labels.
+   - No more than 6 atoms in a single diagram.
+   - Connection-type edge labels mandatory when `connection_type ≠ general`.
+   - No floating nodes (every node has ≥1 edge).
+4. **Invoke renderer.** Pass brand tokens explicitly; renderer must not invent colors or fonts.
+5. **Post-render verification.**
+   - Output file(s) exist and are non-empty.
+   - PNG dimensions match declared aspect ratio.
+   - For tier 1: SVG also produced alongside PNG.
+6. **Annotate bundle.** Write `01-projects/linkedin/backlog/<slug>/visual-checks.json` with check results.
+
+## Anti-patterns (these are deterministic, not aesthetic preferences)
+
+| Check | Why it matters |
+|---|---|
+| No center-radial-gradient | Generic AI aesthetic; instantly readable as generated |
+| No drop shadows on nodes | Adds visual noise without information |
+| No all-caps body labels | Reads as marketing-deck, not analytical |
+| Max 6 nodes per diagram | Cognitive load; Miller's 7±2 minus margin |
+| Edge labels when typed | Untyped edges are weakest connection-graph signal |
+| Aspect ratio 1:1 or 4:5 | LinkedIn-feed display optimization |
+
+## Examples
+
+### Example 1 — Tier 1 diagram approval
+
+Input: `brief` with 3 atoms, 2 typed connections, visual_tier=1_diagram.
+Brand-spec: teal accent, Geist font.
+
+Process:
+1. Load brand-spec → confirm `colors.accent_primary` exists.
+2. Validate: 3 nodes ✓, edge count ≥ nodes-1 ✓, aspect 1:1 ✓.
+3. Anti-patterns: no shadows used ✓, labels mixed-case ✓.
+4. Renderer outputs PNG + SVG.
+5. Verify both files exist, PNG is 1080×1080 px.
+6. Write checks file.
+
+Output: `visual-checks.json` with `{"passed": true, "checks": [...]}`.
+
+### Example 2 — Tier 1 rejection
+
+Input: brief with 8 atoms.
+
+Process:
+1. Validate: 8 nodes > 6 → FAIL.
+2. Return validation error before invoking renderer.
+
+Output: error surfaced to user; renderer not invoked.
+
+## Output contract
+
+- On success: bundle directory contains the visual asset(s) and `visual-checks.json`.
+- On failure: clear error message naming the failed check; renderer not invoked; bundle remains in pre-render state.
