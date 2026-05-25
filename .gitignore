@@ -46,8 +46,7 @@
 !05-daily/TEMPLATE.md
 
 # --- .claude operational state (not skeleton) ---
-.claude/logs/*.log
-.claude/logs/*.jsonl
+.claude/logs/*
 .claude/projects/
 .claude/reminders/
 .claude/state/
