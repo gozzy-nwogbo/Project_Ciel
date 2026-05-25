@@ -57,7 +57,7 @@ class ConvergenceFinder:
             strategy_params={"topic": topic, "domains": domains},
             atoms_used=[AtomRef(slug=a.slug, role="primary") for a in chosen],
             angle=angle,
-            visual_tier="2_carousel",
+            visual_tier="1_diagram",
             status=Status.DRAFTING,
             topic_tags=[topic],
         )

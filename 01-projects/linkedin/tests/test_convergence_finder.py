@@ -25,6 +25,14 @@ def test_finds_three_domains(atom_source, project_root):
     assert len(domains) >= 3
 
 
+def test_default_visual_tier_is_diagram(atom_source, project_root):
+    """v1.1: convergence_finder defaults to 1_diagram (atom-card handles 3 atoms)."""
+    ctx = _ctx(atom_source, project_root)
+    strategy = ConvergenceFinder()
+    brief = strategy.generate_brief(ctx, {"topic": "trust"})
+    assert brief.visual_tier == "1_diagram"
+
+
 def test_fails_when_no_convergence(atom_source, project_root):
     ctx = _ctx(atom_source, project_root)
     strategy = ConvergenceFinder()
