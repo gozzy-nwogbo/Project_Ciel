@@ -13,6 +13,7 @@ When the user types `/linkedin-status [args]`:
 
 ```bash
 cd /Users/gozzynwogbo/second-brain/01-projects/linkedin && \
+PYTHONPATH=src \
 LINKEDIN_PROJECT_ROOT=/Users/gozzynwogbo/second-brain/01-projects/linkedin \
 python -m cli.linkedin_status $ARGS
 ```
