@@ -110,8 +110,13 @@ def _generate(args, atom_source: Path, project_root: Path, brand_spec: Path) -> 
     storage.write(brief)
     state_log.record(brief.slug, "n/a", "drafting", actor="engine")
 
+    from sources.registry import SourcesRegistry
+
+    sources_path = Path(os.environ.get("LINKEDIN_SOURCES_REGISTRY", project_root / "sources.yml"))
+    sources_registry = SourcesRegistry(sources_path)
+
     client = _make_anthropic_client()
-    gen = TextGenerator(client=client, loader=loader)
+    gen = TextGenerator(client=client, loader=loader, sources_registry=sources_registry)
     brief = gen.generate(brief)
     storage.write(brief)
     state_log.record(brief.slug, "drafting", "text_ready", actor="engine")
@@ -122,10 +127,8 @@ def _generate(args, atom_source: Path, project_root: Path, brand_spec: Path) -> 
 
 def _advance(slug: str, project_root: Path, brand_spec: Path, atom_source: Path, args) -> int:
     from atom_loader import AtomLoader
-    from connection_graph import ConnectionGraph
     from linter.linter import Linter
     from models import Status
-    from renderers.diagram import DiagramRenderer
     from state_log import StateLog
     from storage.filesystem import FilesystemAdapter
     from usage.atom_usage import AtomUsageTracker
@@ -152,31 +155,37 @@ def _advance(slug: str, project_root: Path, brand_spec: Path, atom_source: Path,
     state_log.record(slug, "text_ready", "gate1_approved", actor="user")
 
     if brief.visual_tier == "1_diagram":
+        from renderers.atom_card import AtomCardRenderer
+        from sources.registry import SourcesRegistry
+        from sources.tldr_filler import TldrFiller
+
         loader = AtomLoader(atom_source)
-        graph = ConnectionGraph(loader.load_all())
-        renderer = DiagramRenderer(loader=loader, graph=graph, brand_spec_path=brand_spec)
+        sources_path = Path(os.environ.get("LINKEDIN_SOURCES_REGISTRY", project_root / "sources.yml"))
+        sources_registry = SourcesRegistry(sources_path)
+
+        import anthropic
+        client = anthropic.Anthropic()
+        tldr_filler = TldrFiller(client=client)
+
+        renderer = AtomCardRenderer(
+            loader=loader,
+            sources_registry=sources_registry,
+            brand_spec_path=brand_spec,
+            tldr_filler=tldr_filler,
+        )
         out_dir = project_root / "backlog" / slug
         validation_errors = renderer.validate(brief)
-        edgeless = any("edgeless" in e.lower() for e in validation_errors)
-        if edgeless and not args.force:
-            print(
-                "WARNING: Tier 1 diagram skipped — no connection atoms exist among the chosen atoms.",
-                file=sys.stderr,
-            )
-            print(
-                "  Bundle advanced to gate2_pending without a visual. Use --force to render anyway.",
-                file=sys.stderr,
-            )
-            brief.visual_asset_paths = []
-            brief.status = Status.GATE2_PENDING
-            storage.write(brief)
-            state_log.record(slug, "gate1_approved", "gate2_pending", actor="engine", note="edgeless_tier1_skipped")
-        else:
-            result = renderer.render(brief, out_dir)
-            brief.visual_asset_paths = [str(p) for p in result.asset_paths]
-            brief.status = Status.GATE2_PENDING
-            storage.write(brief)
-            state_log.record(slug, "gate1_approved", "gate2_pending", actor="engine")
+        if validation_errors and not args.force:
+            print("Renderer validation errors:", file=sys.stderr)
+            for e in validation_errors:
+                print(f"  - {e}", file=sys.stderr)
+            print("Use --force to render anyway (will likely fail).", file=sys.stderr)
+            return 5
+        result = renderer.render(brief, out_dir)
+        brief.visual_asset_paths = [str(p) for p in result.asset_paths]
+        brief.status = Status.GATE2_PENDING
+        storage.write(brief)
+        state_log.record(slug, "gate1_approved", "gate2_pending", actor="engine")
     else:
         # Text-only tiers (0_text, etc.) skip rendering and advance directly to Gate 2.
         brief.visual_asset_paths = []
