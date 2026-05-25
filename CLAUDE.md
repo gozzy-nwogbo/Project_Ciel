@@ -18,7 +18,8 @@ second-brain/
 ├── 04-reflections/            ← retrospectives, voice profile, meeting debriefs
 ├── 05-resources/              ← templates, prompt frameworks, reusable assets
 ├── 06-daily/                  ← session logs and daily notes
-└── 07-portfolio/              ← preserved finished work, promoted from active projects
+├── 07-portfolio/              ← preserved finished work, promoted from active projects
+└── 09-system/                 ← system-level config and operational files
 ```
 
 **Navigation rules:**
@@ -37,6 +38,17 @@ second-brain/
 | open-brain MCP server | `~/second-brain/01-projects/open-brain/mcp-server/server.py` |
 
 **MCP server:** Configured in `.mcp.json`. Starts automatically when Claude Code connects. Requires `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, and `OPENAI_API_KEY` in `.env`.
+
+**Open Brain MCP tools (4 tools, 4 tables):**
+
+| Tool | Purpose |
+|------|---------|
+| `semantic_search` | Cosine similarity search via pgvector across any table |
+| `list_recent` | Paginated recent entries from any table |
+| `stats` | Row counts, last updated, embedding coverage per table |
+| `write` | Insert/upsert records with auto-generated embeddings |
+
+Tables: `captures`, `people`, `projects`, `ideas`. All queries exclude the raw embedding vector from results.
 
 **Granola:** AI training opt-out must be enabled in Granola Settings before MCP is connected. Meeting notes are sensitive, do not pass full transcripts into context. Extract and discard pattern only.
 
@@ -243,6 +255,41 @@ Skills live in `.claude/skills/` as invocable files.
 
 ---
 
+## 12b. Automated Hooks
+
+Four hooks fire automatically via `.claude/settings.json`. Do not duplicate what these already handle.
+
+| Hook | Trigger | Script | What It Does |
+|------|---------|--------|-------------|
+| SessionStart | Every session open | `session-start.py` | Loads memory layer (soul, user, memory), checks `act_now` for stale items |
+| SessionEnd | Every session close | `summarize-session.py` | Background Haiku call writes structured summary to `06-daily/` |
+| PostToolUse | Any `mcp__*` call | `log-mcp-payload.py` | Logs every MCP tool invocation to `system-events.jsonl` |
+| PreCompact | Before context compaction | `summarize-session.py` | Saves session state before context is compressed |
+
+The SessionEnd and PreCompact hooks handle daily log writes automatically. The ACT NOW capture protocol (Section 11) is behavioral, not automated.
+
+---
+
+## 12c. Utility Scripts
+
+Scripts in `.claude/scripts/` for pipeline and maintenance tasks. Run with `python3`.
+
+| Script | Purpose | When to Run |
+|--------|---------|------------|
+| `flush.py` | Extract concepts/connections from daily logs, promote to `02-knowledge/` | Daily (or via cron) |
+| `lint.py` | Surface gaps, stale articles, broken wiki-links, uncompiled inbox items | Periodically as health check |
+| `check-staging.py` | Check `00-inbox/staging/` for items awaiting promotion | Before processing inbox |
+| `index-daily-logs.py` | Build/update index of daily log entries | After flush or on demand |
+| `convert-to-markdown.py` | Convert non-markdown inputs (PDFs, etc.) to markdown | Before ingesting raw content |
+| `event-log.py` | Query/inspect `system-events.jsonl` | Debugging permission issues |
+| `log-mcp-payload.py` | Log MCP tool call payloads (called by PostToolUse hook) | Automated only |
+| `session-start.py` | Load memory layer, surface stale act_now (called by SessionStart hook) | Automated only |
+| `summarize-session.py` | Write daily log summary (called by SessionEnd/PreCompact hooks) | Automated only |
+
+Procedural docs for compound operations: `.claude/scripts/compile.md`, `.claude/scripts/flush.md`, `.claude/scripts/lint.md`.
+
+---
+
 ## 13. Output Routing
 
 | Output type | Goes in |
@@ -304,10 +351,8 @@ Every MCP tool call must produce: (1) a `.claude/logs/system-events.jsonl` entry
 - After any session that uses MCP tools, run `tail -5 .claude/logs/system-events.jsonl` to verify entries exist.
 - Run the `permission-log-coverage` harness test (`.claude/tests/harness/permission-log-coverage.md`) after any integration change.
 - Weekly: run `flag_incomplete_logs.py` to catch entries missing the `reason` field in `permission_log`.
-- Permission boundaries enforced by `check_violations.py` reading from `01-projects/open-brain/config/permission-boundaries.json`.
+- Permission boundaries enforced by `check_violations.py` reading from `01-projects/open-brain/config/permission-boundaries.json`. Integration-level tool allowlists are in `.claude/settings.json`.
 - Session start and close hooks automatically write to permission_log. This provides bookend coverage for every session without manual logging.
-
----
 
 ---
 
@@ -329,5 +374,5 @@ Commands live in `.claude/commands/` as markdown files. Type `/command-name` in 
 
 ---
 
-*Last updated: 2026-04-30*
+*Last updated: 2026-05-22*
 *This is a living document. Update it when conventions change -- do not let it drift from actual practice.*
