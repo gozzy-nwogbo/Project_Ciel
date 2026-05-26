@@ -43,6 +43,7 @@
 01-projects/linkedin/backlog/
 01-projects/linkedin/state/
 01-projects/linkedin/logs/
+01-projects/linkedin/.cache/
 
 # --- 05-daily: keep TEMPLATE.md tracked ---
 05-daily/*
