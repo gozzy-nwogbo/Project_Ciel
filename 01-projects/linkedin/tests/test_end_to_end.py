@@ -2,6 +2,8 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from cli.draft_post import main as draft_post_main
 from models import Status
 from storage.filesystem import FilesystemAdapter
@@ -9,6 +11,7 @@ from storage.filesystem import FilesystemAdapter
 
 def test_full_pipeline_two_atom_bridge(atom_source, project_root, brand_spec, monkeypatch):
     """End-to-end: generate two_atom_bridge draft, advance through Gate 1, render diagram, mark posted."""
+    pytest.importorskip("playwright.sync_api")
     monkeypatch.setenv("LINKEDIN_ATOM_SOURCE", str(atom_source))
     monkeypatch.setenv("LINKEDIN_PROJECT_ROOT", str(project_root))
     monkeypatch.setenv("LINKEDIN_BRAND_SPEC", str(brand_spec))

@@ -76,8 +76,26 @@ def test_bridge_panel_label_derived_from_connection_type():
     assert _LABEL_BY_CONNECTION_TYPE["general"] == "BRIDGE"
 
 
-def test_bridge_unknown_connection_type_falls_back_to_bridge_label():
-    """If a connection edge has an unrecognized connection_type, panel_label falls back to BRIDGE."""
-    from strategies.two_atom_bridge import _LABEL_BY_CONNECTION_TYPE
-    fallback = _LABEL_BY_CONNECTION_TYPE.get("unknown-type", "BRIDGE")
-    assert fallback == "BRIDGE"
+def test_bridge_unknown_connection_type_falls_back_to_bridge_label(
+    atom_source, project_root, monkeypatch
+):
+    """If a connection edge has an unrecognized connection_type, generate_brief falls back to BRIDGE."""
+    from connection_graph import Edge
+
+    ctx = _ctx(atom_source, project_root)
+
+    synthetic_edge = Edge(
+        from_slug="sample-concept",
+        to_slug="third-concept",
+        from_title="Sample Concept",
+        to_title="Third Concept",
+        connection_type="unknown-type",
+        claim="",
+    )
+    monkeypatch.setattr(ctx.graph, "edges_for", lambda slug: [synthetic_edge])
+
+    brief = TwoAtomBridge().generate_brief(ctx, {
+        "atom_a": "sample-concept",
+        "atom_b": "third-concept",
+    })
+    assert brief.panel_label == "BRIDGE"
