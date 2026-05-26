@@ -274,3 +274,59 @@ Final user feedback: "all in all, this is a much better run than the last one...
 - **Slug-safety on source slug** carryover from v1.0.1 + v1.1.x. Commas in bundle paths still present.
 - **Atom domain validation in renderer.** Spec §6.4 called for `BridgeCardRenderer.validate()` to check "atoms in different domains" and `ConvergenceCardRenderer.validate()` to check "≥3 distinct domains." Both checks live upstream in the strategy code instead. Renderer is not self-protecting against hand-crafted same-domain briefs.
 
+---
+
+## 2026-05-26 — v1.2.1: friction + tldr hygiene + strategy-aware THESIS
+
+Three-item follow-up landing the v1.2 cleanup items. Branch `feat/linkedin-engine-v1.2.1`, 4 commits, 110/110 tests pass.
+
+### Item 1: friction kill
+
+- `01-projects/linkedin/bin/draft-post` shell wrapper bundles `PYTHONPATH=src`, `LINKEDIN_ATOM_SOURCE`, `LINKEDIN_PROJECT_ROOT`, `LINKEDIN_BRAND_SPEC` and forwards args to `python3 -m cli.draft_post`. Usable from any working directory.
+- `.gitignore` updated to whitelist `01-projects/linkedin/bin/` and `01-projects/linkedin/scripts/`.
+- `01-projects/linkedin/CLAUDE.md` "How to run" section rewritten with three invocation tiers (slash command for Claude Code, `./bin/draft-post` for terminal, raw `python -m cli.draft_post` only when debugging the wrapper). Explicit note that pasting env-var prefixes means "you're doing it wrong."
+- Verified by running all v1.2.1 smokes through `./bin/draft-post`. No multi-line env-var pasting at any point.
+
+Commit `eeaaec5`.
+
+### Item 2: tldr re-cap
+
+Eleven atoms in `02-knowledge/` had pre-truncated tldrs ending in `…` (the v1.1.1 safety-net signature). Renderer reads what the atom file holds, so the truncation surfaced as incomplete sentences in convergence funnel cards.
+
+- Tightened the `TldrFiller.SYSTEM_PROMPT` to target 60 chars with 80 as the hard cap, plus an explicit "draft, count, rewrite shorter, aim short" instruction.
+- Added `01-projects/linkedin/scripts/recap_tldrs.py` maintenance script: scans the vault for `…`-ending tldrs and re-runs `TldrFiller`. Cost: ~$0.001 per atom on Haiku.
+
+Findings:
+- Even with the tightened prompt, Haiku consistently overshoots 80 chars and the safety net cuts with `…` again. 8 of 9 first-pass regenerations still came back truncated.
+- Hand-fixed all 9 atoms from the first pass + 2 more discovered during the v1.2.1 verification smoke (filler-generated truncations from the v1.2 live smokes that the initial scan missed): 11 total. All complete sentences ≤80 chars now.
+- Three additional atoms surfaced by a second convergence smoke had no `tldr` at all (the strategy picks based on cooldown rotation; fresh atoms = fresh fill calls). Pre-loaded clean tldrs by hand before render to dodge the Haiku-overshoot path entirely.
+
+Commit `5195cb6`.
+
+### Item 3: strategy-aware THESIS
+
+Added `CONVERGENCE_THESIS_OVERRIDE` to `text_generator.py`. `_compose_system_prompt(strategy)` now appends both `CLAIM_TAG_RULE` and the THESIS override when the strategy is `convergence_finder`. The override explicitly tells the LLM "do not put the aphorism inside <THESIS>; do not put the framing inside <CLAIM>; the visual depends on the role split."
+
+Two new tests in `test_text_generator.py`: one asserts the override fires only for convergence, the other asserts the override mentions framing routing.
+
+Smoke result: CLAIM correctly held a synthesis takeaway ("Whenever a domain matures, it converges on the same answer..."). THESIS still tended toward aphorism rather than the explicit framing line. The LLM's bias toward "aphorism in THESIS" is strong enough that the override is competing rather than dominating.
+
+User accepted this as the natural shape: "aphorism on top, synthesis below reads fine." The original v1.2 user complaint (CLAIM holding the framing observation, reading backwards) is fully resolved. Pushing further to force the framing line into THESIS is treated as v1.2.2 work if needed.
+
+Commit `6814312`.
+
+### Final state
+
+- Branch: `feat/linkedin-engine-v1.2.1` with 4 commits.
+- Tests: 110/110 pass (108 from v1.2 + 2 new for THESIS override).
+- Vault: 11 truncated tldrs cleaned + 3 missing tldrs pre-loaded = 14 atoms touched, all complete-sentence tldrs.
+- Engine: tighter TldrFiller prompt; CONVERGENCE_THESIS_OVERRIDE constant; new helper script `scripts/recap_tldrs.py`.
+- Wrapper: `bin/draft-post` ships.
+
+### v1.2.2 follow-ups (not blocking merge)
+
+- **TldrFiller retry-on-overshoot.** Haiku overshoots the 80-char cap on ~90% of generations even with the tightened prompt. Safety-net truncation produces `…` endings. Fix: detect overshoot (pre-cut response > 80 chars), call again with "rewrite in under 50 chars" follow-up, accept whichever shorter result lands. Or: switch to Sonnet for tldr fills (more reliable, ~3x the cost per atom but still trivial).
+- **THESIS override needs more force.** Current override is the last block in the system prompt but loses to the universal "standalone aphorism" instruction earlier in `VOICE_SYSTEM_PROMPT`. Options: edit the THESIS rule itself to be strategy-aware via prompt assembly (replace the line for convergence rather than append an override); or accept that "aphorism on top, synthesis below" is the natural shape and remove the override.
+- **Moving-target truncation.** As long as the filler is unreliable, every smoke with fresh atoms can introduce new truncated tldrs. The retry-on-overshoot fix above is the structural answer; until then, the recap script is the maintenance pass.
+- Carryover from v1.2: `--reset-cooldowns` flag, slug-safety, `atom_card.html.j2` migration to shared CSS partial, renderer-side domain validation.
+
