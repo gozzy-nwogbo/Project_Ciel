@@ -25,15 +25,38 @@ def test_finds_three_domains(atom_source, project_root):
     assert len(domains) >= 3
 
 
-def test_default_visual_tier_is_text(atom_source, project_root):
-    """v1.1.3: convergence defaults to text-only — atom-card template
-    flattens a hub-and-spokes shape into a bullet list. User can opt
-    into 1_diagram with --tier=1.
-    """
+def test_default_visual_tier_is_diagram(atom_source, project_root):
+    """v1.2: convergence defaults to Tier 1 diagram at 4:5."""
     ctx = _ctx(atom_source, project_root)
     strategy = ConvergenceFinder()
     brief = strategy.generate_brief(ctx, {"topic": "trust"})
-    assert brief.visual_tier == "0_text"
+    assert brief.visual_tier == "1_diagram"
+
+
+def test_convergence_brief_uses_tier1_diagram_at_4x5(atom_source, project_root):
+    """v1.2: convergence_finder defaults to Tier 1 atom-card at 4:5."""
+    ctx = _ctx(atom_source, project_root)
+    strategy = ConvergenceFinder()
+    brief = strategy.generate_brief(ctx, {"topic": "trust"})
+    assert brief.visual_tier == "1_diagram"
+    assert brief.aspect_ratio == "4:5"
+    assert brief.panel_claim == ""
+
+
+def test_convergence_panel_label_composes_from_topic(atom_source, project_root):
+    """panel_label is 'CONVERGES ON · {topic.upper()}'."""
+    ctx = _ctx(atom_source, project_root)
+    strategy = ConvergenceFinder()
+    brief = strategy.generate_brief(ctx, {"topic": "trust"})
+    assert brief.panel_label == "CONVERGES ON · TRUST"
+
+
+def test_convergence_panel_label_uppercases_multiword_topic(atom_source, project_root):
+    """Topic with spaces is uppercased verbatim."""
+    ctx = _ctx(atom_source, project_root)
+    strategy = ConvergenceFinder()
+    brief = strategy.generate_brief(ctx, {"topic": "decision making"})
+    assert brief.panel_label == "CONVERGES ON · DECISION MAKING"
 
 
 def test_fails_when_no_convergence(atom_source, project_root):

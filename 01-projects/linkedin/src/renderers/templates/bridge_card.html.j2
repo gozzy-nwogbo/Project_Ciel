@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    {% include "_card_frame.css.j2" %}
+
+    html, body { width: 1080px; height: 1350px; }
+
+    .card { width: 1080px; height: 1350px; padding: 90px 86px; }
+
+    .meta-row { margin-bottom: 56px; }
+    .meta, .domain { font-size: 26px; }
+
+    .thesis { font-size: {{ thesis_font_size }}; margin-bottom: 64px; }
+
+    .pillars {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 36px;
+      flex: 1;
+    }
+    .pillar {
+      background: {{ colors.surface_subtle }};
+      border: 1px solid {{ colors.border }};
+      border-radius: 10px;
+      padding: 40px 36px;
+      display: flex;
+      flex-direction: column;
+    }
+    .pillar-domain {
+      font-size: 22px;
+      color: {{ colors.text_secondary }};
+      font-family: {{ typography.mono }};
+      letter-spacing: 0.05em;
+      text-transform: lowercase;
+      margin-bottom: 24px;
+    }
+    .pillar-name {
+      font-size: 36px;
+      font-weight: 600;
+      color: {{ colors.text_primary }};
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+    .pillar-tldr {
+      font-size: 28px;
+      color: {{ colors.text_secondary }};
+      line-height: 1.4;
+      margin-top: auto;
+    }
+
+    .mechanism-band {
+      background: {{ colors.background }};
+      border: 1px dashed {{ colors.accent_primary }};
+      border-radius: 10px;
+      padding: 36px 40px;
+      margin-top: 36px;
+      text-align: center;
+    }
+    .mechanism-band .panel-label { font-size: 22px; margin-bottom: 18px; }
+    .mechanism-band .panel-claim { font-size: 32px; }
+
+    .footer-row { margin-top: 56px; font-size: 24px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="meta-row">
+      <div class="meta">from second brain</div>
+      <div class="domain">{{ domain_tag }}</div>
+    </div>
+    <div class="thesis">{{ thesis }}</div>
+    <div class="pillars">
+      <div class="pillar">
+        <div class="pillar-domain">{{ atom_a.domain }}</div>
+        <div class="pillar-name">{{ atom_a.name }}</div>
+        <div class="pillar-tldr">{{ atom_a.tldr }}</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-domain">{{ atom_b.domain }}</div>
+        <div class="pillar-name">{{ atom_b.name }}</div>
+        <div class="pillar-tldr">{{ atom_b.tldr }}</div>
+      </div>
+    </div>
+    <div class="mechanism-band">
+      <div class="panel-label">{{ panel_label }}</div>
+      <div class="panel-claim">{{ panel_claim }}</div>
+    </div>
+    <div class="footer-row">
+      <div class="footer-source">2 atoms · cross-domain</div>
+      <div class="footer-count">two-atom-bridge</div>
+    </div>
+  </div>
+</body>
+</html>

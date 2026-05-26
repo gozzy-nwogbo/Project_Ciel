@@ -155,7 +155,7 @@ def _advance(slug: str, project_root: Path, brand_spec: Path, atom_source: Path,
     state_log.record(slug, "text_ready", "gate1_approved", actor="user")
 
     if brief.visual_tier == "1_diagram":
-        from renderers.atom_card import AtomCardRenderer
+        from renderers import registry
         from sources.registry import SourcesRegistry
         from sources.tldr_filler import TldrFiller
 
@@ -167,7 +167,8 @@ def _advance(slug: str, project_root: Path, brand_spec: Path, atom_source: Path,
         client = anthropic.Anthropic()
         tldr_filler = TldrFiller(client=client)
 
-        renderer = AtomCardRenderer(
+        renderer = registry.for_strategy(
+            brief.strategy,
             loader=loader,
             sources_registry=sources_registry,
             brand_spec_path=brand_spec,

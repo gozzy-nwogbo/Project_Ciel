@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: {{ colors.background }};
+  font-family: {{ typography.body }};
+  color: {{ colors.text_primary }};
+  -webkit-font-smoothing: antialiased;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.meta {
+  color: {{ colors.accent_primary }};
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.domain {
+  color: {{ colors.text_secondary }};
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: {{ typography.mono }};
+}
+
+.thesis {
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: {{ colors.text_primary }};
+}
+
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: {{ typography.mono }};
+  letter-spacing: 0.02em;
+  gap: 24px;
+}
+
+.footer-source, .footer-count { white-space: nowrap; }
+.footer-source { color: {{ colors.text_primary }}; }
+.footer-count  { color: {{ colors.text_secondary }}; }
+
+.panel-label {
+  color: {{ colors.accent_primary }};
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-family: {{ typography.mono }};
+}
+
+.panel-claim {
+  color: {{ colors.text_primary }};
+  font-style: italic;
+  line-height: 1.3;
+}
