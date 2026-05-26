@@ -393,3 +393,48 @@ These are strategy-design concerns, not engine bugs. v1.2.2 ships with the engin
 - **Voice linter prompt-time reinforcement.** Contrastive framing rule is in the prompt and the linter catches violations post-hoc, but the model still produces them ~10% of the time. Consider a CLAIM-specific reinforcement that re-states the prohibition right where the synthesis sentence lands.
 - Carryover from v1.2.1: `--reset-cooldowns` flag, slug-safety, `atom_card.html.j2` migration to shared CSS partial, renderer-side domain validation.
 
+---
+
+## 2026-05-26 — v1.3 design: atom-coherence scoring for convergence_finder
+
+Resolves the v1.2.2 finding ("convergence picks atoms by tag overlap, not semantic coherence"). Approach picked: embedding cosine similarity, score candidate triples by minimum pairwise similarity. Brainstorm closed on six decisions. Full implementation plan in `2026-05-26-v1-3-implementation-plan.md`.
+
+### Decisions
+
+| Question | Choice | Rationale |
+|---|---|---|
+| Embedding provider | OpenAI `text-embedding-3-small` (1536 dims) | Reuses the `OPENAI_API_KEY` already in `.env` for open-brain MCP. ~$0.02 one-time vault embed, near-zero per-finder cost. Quality is sufficient for triple ranking. Only new dep is the `openai` Python package. |
+| Embed scope | `title + body` per atom | Title anchors the semantic gist (e.g., "Child Development Trust"); body adds context. Robust against body-language drift toward domain-specific framing. |
+| Cache + lifecycle | Lazy, single JSON file at `01-projects/linkedin/.cache/atom-embeddings.json`, gitignored. Schema: `{slug: {body_hash, embedding}}`. Hash mismatch re-embeds. | Matches the engine's on-demand pattern (everything is lazy/per-invocation). Easy to inspect, easy to nuke. Hash-keyed invalidation handles atom edits cleanly. |
+| Threshold | `0.35` default, configurable via env var `LINKEDIN_CONVERGENCE_MIN_SIM` or per-call param. Log min-sim to `logs/state.jsonl` each run. | Liberal start that still rejects the v1.2.2 'feedback' failure case (estimated min-sim 0.2–0.3). Tunable for empirical calibration over the first 5–10 smoke runs. |
+| Failure mode | Hard `ValueError` with diagnostic payload: best min-sim found, threshold used, slugs of top 3 candidate triples ranked by min-sim. | Surfaces enough info to debug or recalibrate without re-running. No automatic fallback. Engine stays deterministic. |
+| Integration | Replace per-domain selection entirely. Enumerate every `(domain-triple × atom-per-domain)` combination, score each by min pairwise cosine, pick highest. Drop graph-connectivity heuristic. | Fixes both "first 3 domains is arbitrary" and "per-domain pick uses the wrong signal" in one move. ~500 candidate triples per topic (cheap math on cached vectors). |
+
+### Combinatorics check
+
+For a topic like 'feedback' (~5 domains, ~3–5 atoms per domain):
+
+- Domain triples: `C(5, 3) = 10`
+- Atom triples per domain-triple: 3³ to 5³ = 27 to 125
+- Total candidates: ~500
+- Per candidate: 3 cosine sims on cached 1536-dim vectors
+
+In-memory, well under 100ms total.
+
+### Architectural impact
+
+New module `src/embeddings/` with three files:
+
+- `provider.py`: `OpenAIEmbedder` wrapping `text-embedding-3-small`.
+- `cache.py`: `EmbeddingCache` with hash-based invalidation, JSON persistence.
+- `coherence.py`: pure functions for cosine similarity, min-pairwise, triple ranking.
+
+`StrategyContext` gains an optional `embedder: Embedder | None` field. `convergence_finder.generate_brief` is rewritten end-to-end (graph-connectivity ranking removed; coherence ranking added). No changes to other strategies, renderers, voice linter, or text generator.
+
+### What v1.3 explicitly does NOT include
+
+- Coherence scoring for `bridge_finder`. The v1.2.2 failure was convergence-specific; bridges already have a tighter mechanism-edge constraint.
+- Topic auto-discovery via clustering.
+- Migration to a vector DB or Supabase. Premature at this scale.
+- Re-introducing connectivity as a soft tiebreaker or weighted signal. Revisit only if pure coherence ranking surfaces fringe atoms in practice.
+
