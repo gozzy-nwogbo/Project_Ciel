@@ -57,7 +57,12 @@ class ConvergenceFinder:
             strategy_params={"topic": topic, "domains": domains},
             atoms_used=[AtomRef(slug=a.slug, role="primary") for a in chosen],
             angle=angle,
-            visual_tier="1_diagram",
+            # v1.1.3 — atom-card template is wrong shape for convergence
+            # (multiple distant atoms pointing at a shared center; the
+            # card flattens that into a bullet list). Default to text-only
+            # until a convergence-specific visual treatment is designed.
+            # --tier=1 still available if the user opts in.
+            visual_tier="0_text",
             status=Status.DRAFTING,
             topic_tags=[topic],
         )
