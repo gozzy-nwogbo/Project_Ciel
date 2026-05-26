@@ -42,15 +42,14 @@ def test_full_pipeline_two_atom_bridge(atom_source, project_root, brand_spec, mo
         assert (project_root / "backlog" / bundle_slug / "text.md").exists()
 
         # 3. Advance through Gate 1.
-        # v1.1.3: two_atom_bridge defaults to 0_text (atom-card visual is
-        # the wrong shape for a "connection between two things"). No PNG
-        # is rendered; visual_asset_paths stays empty.
+        # v1.2: two_atom_bridge defaults to 1_diagram at 4:5, so a PNG is
+        # rendered during advancement and visual_asset_paths is populated.
         rc = draft_post_main(["--advance", bundle_slug])
         assert rc == 0
 
         brief = storage.read(bundle_slug)
         assert brief.status is Status.GATE2_PENDING
-        assert brief.visual_asset_paths == []
+        assert len(brief.visual_asset_paths) == 1
 
         # 4. Approvals log has an entry with edit_delta
         approvals_path = project_root / "state" / "approvals.jsonl"

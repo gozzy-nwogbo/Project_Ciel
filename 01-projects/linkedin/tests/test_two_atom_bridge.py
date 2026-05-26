@@ -30,18 +30,15 @@ def test_explicit_pair_uses_typed_claim(atom_source, project_root):
     assert brief.strategy_params.get("connection_type") == "analogical"
 
 
-def test_default_visual_tier_is_text(atom_source, project_root):
-    """v1.1.3: bridge defaults to text-only — the atom-card template is the
-    wrong conceptual shape for "connection between two things." User can
-    opt into 1_diagram with --tier=1 if they want the card anyway.
-    """
+def test_default_visual_tier_is_diagram(atom_source, project_root):
+    """v1.2: bridge defaults to Tier 1 diagram at 4:5."""
     ctx = _ctx(atom_source, project_root)
     strategy = TwoAtomBridge()
     brief = strategy.generate_brief(ctx, {
         "atom_a": "sample-concept",
         "atom_b": "third-concept",
     })
-    assert brief.visual_tier == "0_text"
+    assert brief.visual_tier == "1_diagram"
 
 
 def test_same_domain_rejected(atom_source, project_root):
@@ -52,3 +49,35 @@ def test_same_domain_rejected(atom_source, project_root):
             "atom_a": "sample-concept",
             "atom_b": "another-concept",
         })
+
+
+def test_bridge_brief_uses_tier1_diagram_at_4x5(atom_source, project_root):
+    """v1.2: bridge defaults to Tier 1 atom-card at 4:5."""
+    ctx = _ctx(atom_source, project_root)
+    strategy = TwoAtomBridge()
+    brief = strategy.generate_brief(ctx, {
+        "atom_a": "sample-concept",
+        "atom_b": "third-concept",
+    })
+    assert brief.visual_tier == "1_diagram"
+    assert brief.aspect_ratio == "4:5"
+    assert brief.panel_label in {
+        "SHARED MECHANISM", "STRUCTURAL ANALOGUE", "INVERSE PAIR", "BRIDGE",
+    }
+    assert brief.panel_claim == ""  # filled later by text_generator
+
+
+def test_bridge_panel_label_derived_from_connection_type():
+    """Label map covers each known connection_type."""
+    from strategies.two_atom_bridge import _LABEL_BY_CONNECTION_TYPE
+    assert _LABEL_BY_CONNECTION_TYPE["mechanism"] == "SHARED MECHANISM"
+    assert _LABEL_BY_CONNECTION_TYPE["analogical"] == "STRUCTURAL ANALOGUE"
+    assert _LABEL_BY_CONNECTION_TYPE["inverse"] == "INVERSE PAIR"
+    assert _LABEL_BY_CONNECTION_TYPE["general"] == "BRIDGE"
+
+
+def test_bridge_unknown_connection_type_falls_back_to_bridge_label():
+    """If a connection edge has an unrecognized connection_type, panel_label falls back to BRIDGE."""
+    from strategies.two_atom_bridge import _LABEL_BY_CONNECTION_TYPE
+    fallback = _LABEL_BY_CONNECTION_TYPE.get("unknown-type", "BRIDGE")
+    assert fallback == "BRIDGE"

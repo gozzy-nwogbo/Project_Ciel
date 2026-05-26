@@ -6,6 +6,13 @@ import uuid
 from models import AtomRef, PostBrief, Status, utc_now
 from strategies.base import StrategyContext
 
+_LABEL_BY_CONNECTION_TYPE = {
+    "mechanism":  "SHARED MECHANISM",
+    "analogical": "STRUCTURAL ANALOGUE",
+    "inverse":    "INVERSE PAIR",
+    "general":    "BRIDGE",
+}
+
 
 class TwoAtomBridge:
     name = "two_atom_bridge"
@@ -56,14 +63,9 @@ class TwoAtomBridge:
                 AtomRef(slug=slug_b, role="primary"),
             ],
             angle=angle,
-            # v1.1.3 — atom-card template (Variant B) was designed for
-            # source_spotlight's "N items from one catalog page" shape.
-            # Bridge is about a connection between two things; the card
-            # presents them as a flat list which misrepresents the visual
-            # story. Defaulting to text-only until a bridge-specific
-            # visual treatment lands in a later phase. --tier=1 still
-            # available if the user opts in.
-            visual_tier="0_text",
+            visual_tier="1_diagram",
+            aspect_ratio="4:5",
+            panel_label=_LABEL_BY_CONNECTION_TYPE.get(connection_type, "BRIDGE"),
             status=Status.DRAFTING,
             topic_tags=sorted(set(atom_a.tags + atom_b.tags)),
         )
