@@ -236,3 +236,7 @@ def test_generate_skips_claim_extraction_for_source_spotlight(tmp_path):
     result = gen.generate(brief)
     assert result.thesis == "Source spotlight thesis."
     assert result.panel_claim == ""
+    # source_spotlight does not extract or strip CLAIM tags. A stray <CLAIM>
+    # from the model would survive in draft_text. This is intentional —
+    # the prompt doesn't include the CLAIM rule for source_spotlight.
+    assert "<CLAIM>" in result.draft_text
