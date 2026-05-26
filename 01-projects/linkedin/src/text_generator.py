@@ -58,28 +58,20 @@ CLAIM_TAG_RULE = """CLAIM TAG (strategy-scoped, two_atom_bridge and convergence_
 _CLAIM_STRATEGIES = {"two_atom_bridge", "convergence_finder"}
 
 
-CONVERGENCE_THESIS_OVERRIDE = """CONVERGENCE-ONLY OVERRIDE (this overrides the "standalone aphorism" guidance in the THESIS rule above for convergence_finder posts only):
-- The funnel visual points down at the bottom panel (CLAIM), so the headline aphorism belongs in CLAIM, not THESIS.
-- For convergence posts, your THESIS sentence is the FRAMING OBSERVATION: a sentence that tells the reader what they are looking at. Example: "Three atoms from completely different domains surfaced in my second brain this week, all circling the same mechanism."
-- Your CLAIM remains the synthesis takeaway aphorism. The pattern is: THESIS = setup, atoms = evidence, CLAIM = payoff.
-- Do not put the aphorism inside <THESIS>. Do not put the framing inside <CLAIM>. The visual depends on the role split.
-"""
-
-
 def _compose_system_prompt(strategy: str) -> str:
     """Compose the per-call system prompt.
 
     Appends CLAIM_TAG_RULE for strategies that need a synthesizing sentence
-    (bridge + convergence). Appends CONVERGENCE_THESIS_OVERRIDE for convergence
-    only, which re-purposes the THESIS role from aphorism to framing observation
-    so the funnel layout reads correctly.
+    (bridge + convergence). The v1.2.1 CONVERGENCE_THESIS_OVERRIDE has been
+    removed in v1.2.2: the LLM bias toward "aphorism in THESIS" is strong
+    enough that the override competed without winning, and the resulting
+    "aphorism on top, synthesis below" shape was accepted as the natural
+    convergence layout. The CLAIM_TAG_RULE alone is sufficient to keep
+    framing-lines out of the CLAIM slot, which was the original v1.2 fix.
     """
-    prompt = VOICE_SYSTEM_PROMPT
     if strategy in _CLAIM_STRATEGIES:
-        prompt += "\n" + CLAIM_TAG_RULE
-    if strategy == "convergence_finder":
-        prompt += "\n" + CONVERGENCE_THESIS_OVERRIDE
-    return prompt
+        return VOICE_SYSTEM_PROMPT + "\n" + CLAIM_TAG_RULE
+    return VOICE_SYSTEM_PROMPT
 
 
 class TextGenerator:
