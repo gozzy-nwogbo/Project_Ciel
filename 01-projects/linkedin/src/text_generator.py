@@ -48,6 +48,22 @@ OUTPUT:
 - Target word count provided in the user prompt — stay in range.
 """
 
+CLAIM_TAG_RULE = """CLAIM TAG (strategy-scoped, two_atom_bridge and convergence_finder only):
+- This post must contain exactly one synthesizing sentence wrapped in <CLAIM>...</CLAIM> tags.
+- For two_atom_bridge: the shared-mechanism sentence. It renders as the italic line inside the mechanism band beneath the two atom pillars. The THESIS above is your headline aphorism; the CLAIM is the mechanism that supports it.
+- For convergence_finder: the synthesis takeaway sentence. The funnel arrows visually point AT this sentence as the conclusion. The CLAIM is your payoff. For convergence posts only, the THESIS above should set up the observation or framing (e.g., "Three atoms from different domains surfaced this week, all pointing at the same thing"), not the takeaway itself. Put the headline aphorism inside <CLAIM>, not <THESIS>.
+- Place the tags where each sentence reads naturally in the body. The engine strips both tag pairs so the saved post.md reads clean.
+"""
+
+_CLAIM_STRATEGIES = {"two_atom_bridge", "convergence_finder"}
+
+
+def _compose_system_prompt(strategy: str) -> str:
+    """Compose the per-call system prompt. Appends CLAIM_TAG_RULE for strategies that need it."""
+    if strategy in _CLAIM_STRATEGIES:
+        return VOICE_SYSTEM_PROMPT + "\n" + CLAIM_TAG_RULE
+    return VOICE_SYSTEM_PROMPT
+
 
 class TextGenerator:
     def __init__(
@@ -104,7 +120,7 @@ class TextGenerator:
         response = self.client.messages.create(
             model=self.model,
             max_tokens=1024,
-            system=VOICE_SYSTEM_PROMPT,
+            system=_compose_system_prompt(brief.strategy),
             messages=[{"role": "user", "content": user_prompt}],
         )
         text = "".join(block.text for block in response.content if hasattr(block, "text"))
@@ -112,8 +128,23 @@ class TextGenerator:
         extraction = extract_thesis(text.strip())
         brief.thesis = extraction.thesis
         brief.draft_text = extraction.clean_body.strip()
-        brief.status = Status.TEXT_READY
+
         brief.updated_at = utc_now()
+        brief.status = Status.TEXT_READY
+
+        if brief.strategy in _CLAIM_STRATEGIES:
+            from linter.tagged import extract_tagged
+            claim_result = extract_tagged(extraction.clean_body, "CLAIM")
+            brief.panel_claim = claim_result.extracted
+            brief.draft_text = claim_result.clean_body.strip()
+            if claim_result.warning:
+                brief.status_history.append({
+                    "status": Status.TEXT_READY.value,
+                    "timestamp": brief.updated_at.isoformat(),
+                    "actor": "engine",
+                    "note": claim_result.warning,
+                })
+
         brief.status_history.append({
             "status": Status.TEXT_READY.value,
             "timestamp": brief.updated_at.isoformat(),

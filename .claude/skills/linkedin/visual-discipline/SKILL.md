@@ -3,7 +3,7 @@ name: linkedin-visual-discipline
 description: Use when rendering or reviewing LinkedIn post visuals (atom-graph diagrams, carousels, video). Enforces brand-spec consultation and anti-pattern checks. Triggers on `render visual`, `tier 1 diagram`, `review carousel`, `visual brief`, LinkedIn post bundle preparation.
 when_to_use: Before any visual asset is committed to a LinkedIn post bundle. Also when reviewing an existing bundle for ship-readiness.
 allowed-tools: Read, Bash, Glob
-version: 1.0
+version: 1.2
 scope: project
 ---
 
@@ -32,10 +32,39 @@ Fire automatically when:
 ## Protocol
 
 1. **Load brand-spec.** Parse the YAML block. If missing or unparseable, halt and surface error.
-2. **Validate brief against tier rules:**
-   - Tier 1: ≤3 distilled atom blocks (4+ atoms apply overflow rule); non-empty thesis (extracted from `<THESIS>` or first-sentence fallback); `tldr` resolved for each shown atom (front-matter or LLM fill succeeded); source slug present in footer; aspect ratio 1:1.
-   - Tier 2: ≤8 slides, ≤50 words/slide, ≤9 augmented images.
-   - Tier 3: ≤12 total asset refs, ≤15s duration, 720p, body text always present.
+2. **Validate brief against tier rules (strategy-keyed for Tier 1 as of v1.2):**
+
+   **Tier 1 · `source_spotlight`:**
+   - ≤3 distilled atom blocks (4+ atoms apply overflow rule)
+   - non-empty thesis (extracted from `<THESIS>` or first-sentence fallback)
+   - `tldr` resolved for each shown atom (front-matter or LLM fill succeeded)
+   - source slug present in footer
+   - aspect ratio 1:1
+   - brand tokens loaded from `brand-spec.md` (no hardcoded colors in template)
+
+   **Tier 1 · `two_atom_bridge` (v1.2):**
+   - exactly 2 atom pillars
+   - atoms in different domains (strategy enforces this)
+   - non-empty thesis
+   - non-empty `panel_label` (derived from `_LABEL_BY_CONNECTION_TYPE`)
+   - non-empty `panel_claim` (from `<CLAIM>` tag or fallback to connection edge claim)
+   - `tldr` resolved per pillar
+   - aspect ratio 4:5
+   - mechanism band uses dashed terracotta border + italic claim
+
+   **Tier 1 · `convergence_finder` (v1.2):**
+   - 3 funnel atoms (truncate at 3 if strategy emits more)
+   - ≥3 distinct domains across atoms
+   - non-empty thesis
+   - non-empty `panel_label` (composed as `CONVERGES ON · {topic}`)
+   - non-empty `panel_claim` (from `<CLAIM>` tag or fallback to angle)
+   - `tldr` resolved per atom
+   - aspect ratio 4:5
+   - convergence panel uses solid terracotta border + italic claim
+
+   **Tier 2:** ≤8 slides, ≤50 words/slide, ≤9 augmented images.
+
+   **Tier 3:** ≤12 total asset refs, ≤15s duration, 720p, body text always present.
 3. **Run anti-pattern checks:**
    - No center-radial-gradient backgrounds.
    - No drop shadows on graph nodes.
@@ -43,25 +72,22 @@ Fire automatically when:
 4. **Invoke renderer.** Pass brand tokens explicitly; renderer must not invent colors or fonts.
 5. **Post-render verification.**
    - Output file(s) exist and are non-empty.
-   - PNG dimensions match declared aspect ratio.
-   - For tier 1: SVG also produced alongside PNG.
+   - PNG dimensions match declared aspect ratio (1:1 = 1080×1080; 4:5 = 1080×1350).
 6. **Annotate bundle.** Write `01-projects/linkedin/backlog/<slug>/visual-checks.json` with check results.
 
-## Anti-patterns (these are deterministic, not aesthetic preferences)
+## Anti-patterns (shared across all Tier 1 strategies)
+
+These are deterministic blockers regardless of which Tier 1 template renders. Strategy-specific rules (atom counts, thesis presence, aspect ratio) now live in the per-strategy tier rules above.
 
 | Check | Why it matters |
 |---|---|
-| No center-radial-gradient | Generic AI aesthetic; instantly readable as generated |
-| No drop shadows on nodes | Adds visual noise without information |
-| No all-caps body labels | Reads as marketing-deck, not analytical |
-| ≤3 distilled atoms per card | Cognitive load on a 1:1 LinkedIn feed image |
-| Non-empty thesis | Card needs a hero line for scroll-stop |
-| Source slug in footer | "Visible system" payload must be present |
-| Aspect ratio 1:1 | LinkedIn-feed display optimization |
+| No center-radial-gradient backgrounds | Generic AI aesthetic; instantly readable as generated |
+| No drop shadows on atom cards or panels | Adds visual noise without information |
+| No all-caps body text | Reads as marketing-deck, not analytical (labels in the band/panel are allowed; tldr text is not) |
 
 ## Examples
 
-### Example 1 — Tier 1 atom-card approval
+### Example 1: Tier 1 atom-card approval (source_spotlight)
 
 Input: `brief` with 3 atoms (each with `tldr` in front-matter), thesis="Strategy is problem-shaped, not goal-shaped.", visual_tier=1_diagram.
 Brand-spec: terracotta accent, Geist font.
@@ -76,7 +102,7 @@ Process:
 
 Output: `visual-checks.json` with `{"passed": true, "checks": [...]}`.
 
-### Example 2 — Tier 1 rejection (empty thesis)
+### Example 2: Tier 1 rejection (empty thesis)
 
 Input: brief with 3 atoms but `brief.thesis == ""` (extraction fell back to empty, body had no usable first sentence).
 
