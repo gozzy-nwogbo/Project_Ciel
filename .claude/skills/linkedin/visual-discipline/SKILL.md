@@ -72,8 +72,7 @@ Fire automatically when:
 4. **Invoke renderer.** Pass brand tokens explicitly; renderer must not invent colors or fonts.
 5. **Post-render verification.**
    - Output file(s) exist and are non-empty.
-   - PNG dimensions match declared aspect ratio.
-   - For tier 1: SVG also produced alongside PNG.
+   - PNG dimensions match declared aspect ratio (1:1 = 1080×1080; 4:5 = 1080×1350).
 6. **Annotate bundle.** Write `01-projects/linkedin/backlog/<slug>/visual-checks.json` with check results.
 
 ## Anti-patterns (shared across all Tier 1 strategies)
