@@ -12,14 +12,31 @@ import frontmatter
 from atom_loader import Atom
 
 
-SYSTEM_PROMPT = """You distill a knowledge atom into one sentence.
+TLDR_MAX_CHARS = 80
 
-The sentence:
+
+SYSTEM_PROMPT = """You distill a knowledge atom into one short sentence.
+
+Hard requirements (these are not aspirational, they are limits):
+- ONE sentence.
+- Under 80 characters total, including the period.
 - Stands alone for a cold reader who has never seen this atom.
-- Is one declarative sentence, ideally under 80 characters.
 - Captures the core mechanism or claim, not metadata about the atom.
 - Plain text only. No quotes, no markdown, no preamble.
+
+If your first draft exceeds 80 characters, rewrite it shorter before responding.
 """
+
+
+def _truncate_at_word_boundary(text: str, max_chars: int) -> str:
+    """Truncate to max_chars at the last whitespace boundary, append ellipsis."""
+    if len(text) <= max_chars:
+        return text
+    cut = text[: max_chars - 1].rstrip()
+    space = cut.rfind(" ")
+    if space > 0:
+        cut = cut[:space]
+    return cut.rstrip(",;:.") + "…"
 
 
 class TldrFiller:
@@ -35,12 +52,12 @@ class TldrFiller:
             f"Domain: {atom.domain or 'unspecified'}\n"
             f"Source: {atom.source or 'unspecified'}\n"
             f"Body:\n{body_snippet}\n\n"
-            f"Produce one sentence."
+            f"Produce one sentence under 80 characters."
         )
         try:
             response = self.client.messages.create(
                 model=self.model,
-                max_tokens=120,
+                max_tokens=40,
                 system=SYSTEM_PROMPT,
                 messages=[{"role": "user", "content": user_prompt}],
             )
@@ -51,6 +68,8 @@ class TldrFiller:
         tldr = text.strip().strip('"').strip()
         if not tldr:
             return None
+        # Safety net — even with a stricter prompt, the LLM may overshoot.
+        tldr = _truncate_at_word_boundary(tldr, TLDR_MAX_CHARS)
 
         if atom.path is not None and atom.path.exists():
             try:
