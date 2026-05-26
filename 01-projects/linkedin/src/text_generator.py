@@ -50,9 +50,9 @@ OUTPUT:
 
 CLAIM_TAG_RULE = """CLAIM TAG (strategy-scoped, two_atom_bridge and convergence_finder only):
 - This post must contain exactly one synthesizing sentence wrapped in <CLAIM>...</CLAIM> tags.
-- For two_atom_bridge: the shared-mechanism sentence. It will render as the italic line inside the mechanism band beneath the two atom pillars.
-- For convergence_finder: the unified-mechanism sentence. It will render as the italic line inside the convergence panel beneath the funnel.
-- Place the tags where the sentence reads naturally in the body. It is part of the post, not a header. The engine strips the tags so the saved post.md reads clean.
+- For two_atom_bridge: the shared-mechanism sentence. It renders as the italic line inside the mechanism band beneath the two atom pillars. The THESIS above is your headline aphorism; the CLAIM is the mechanism that supports it.
+- For convergence_finder: the synthesis takeaway sentence. The funnel arrows visually point AT this sentence as the conclusion. The CLAIM is your payoff. For convergence posts only, the THESIS above should set up the observation or framing (e.g., "Three atoms from different domains surfaced this week, all pointing at the same thing"), not the takeaway itself. Put the headline aphorism inside <CLAIM>, not <THESIS>.
+- Place the tags where each sentence reads naturally in the body. The engine strips both tag pairs so the saved post.md reads clean.
 """
 
 _CLAIM_STRATEGIES = {"two_atom_bridge", "convergence_finder"}
