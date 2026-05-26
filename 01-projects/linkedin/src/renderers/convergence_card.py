@@ -14,7 +14,7 @@ from renderers.base import RenderResult, load_brand_spec
 
 _TEMPLATE_DIR = Path(__file__).parent / "templates"
 
-_ATOM_TEXT_MAX_CHARS = 60
+_ATOM_TEXT_MAX_CHARS = 80
 _THESIS_LARGE_MAX_CHARS = 60
 _THESIS_LARGE_FONT = "78px"
 _THESIS_SMALL_FONT = "60px"
