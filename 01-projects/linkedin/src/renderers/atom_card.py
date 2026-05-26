@@ -1,6 +1,7 @@
 """Tier 1 atom-card renderer (Playwright + Jinja2)."""
 from __future__ import annotations
 
+import re
 import time
 from pathlib import Path
 from typing import Any, Optional
@@ -31,6 +32,20 @@ def _truncate_at_word_boundary(text: str, max_chars: int) -> str:
     if space > 0:
         cut = cut[:space]
     return cut.rstrip(",;:.") + "…"
+
+
+_YEAR_SUFFIX_RE = re.compile(r",\s*\d{4}\s*$")
+
+
+def _strip_citation_year(source: str) -> str:
+    """Drop a trailing ", YYYY" from a source slug for visual display.
+
+    Atom `source:` / `origin:` fields use citation form like
+    "W. Chan Kim & Renee Mauborgne, 2014" so the engine can match into
+    sources.yml. The visual should display the author(s) only — the year
+    is metadata, not content.
+    """
+    return _YEAR_SUFFIX_RE.sub("", source).rstrip()
 
 
 class AtomCardRenderer:
@@ -127,7 +142,7 @@ class AtomCardRenderer:
             if not src:
                 src = ref.source
             if src:
-                source_slug = src
+                source_slug = _strip_citation_year(src)
                 break
 
         # Domain tag — try first atom's domain, fall back to strategy name.

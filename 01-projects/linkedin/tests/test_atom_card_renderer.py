@@ -158,6 +158,22 @@ def test_over_long_tldr_is_truncated_at_render_time(brand_spec):
     assert text.endswith("…")
 
 
+def test_footer_strips_trailing_citation_year(brand_spec):
+    """Year suffix on the source slug is dropped for visual display."""
+    loader = MagicMock()
+    loader.load_one.side_effect = lambda s: _atom(s, tldr="t")
+    renderer = AtomCardRenderer(
+        loader=loader,
+        sources_registry=MagicMock(),
+        brand_spec_path=brand_spec,
+        tldr_filler=None,
+    )
+    brief = _brief(["a"])
+    # _atom assigns source="Test Source, 2026" — the ", 2026" should be stripped
+    ctx = renderer._build_template_context(brief)
+    assert ctx["source_slug"] == "Test Source"
+
+
 def test_thesis_font_size_shrinks_when_long(brand_spec):
     """Thesis under 60 chars uses large font; over 60 chars shrinks to small."""
     loader = MagicMock()
