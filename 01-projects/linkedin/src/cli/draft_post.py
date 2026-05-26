@@ -13,6 +13,12 @@ def _make_anthropic_client():
     return anthropic.Anthropic()
 
 
+def _make_embedder():
+    """Factory for the embedding provider. Patchable in tests."""
+    from embeddings.provider import OpenAIEmbedder
+    return OpenAIEmbedder()
+
+
 def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(prog="draft-post")
     parser.add_argument("--strategy", default=None)
@@ -69,7 +75,14 @@ def _generate(args, atom_source: Path, project_root: Path, brand_spec: Path) -> 
     graph = ConnectionGraph(loader.load_all())
     atom_tracker = AtomUsageTracker(project_root / "state" / "atom-usage.json")
     conn_tracker = ConnectionUsageTracker(project_root / "state" / "connection-usage.json")
-    ctx = StrategyContext(loader=loader, graph=graph, atom_tracker=atom_tracker, connection_tracker=conn_tracker)
+    embedder = _make_embedder() if (args.strategy or "source_spotlight") == "convergence_finder" else None
+    ctx = StrategyContext(
+        loader=loader,
+        graph=graph,
+        atom_tracker=atom_tracker,
+        connection_tracker=conn_tracker,
+        embedder=embedder,
+    )
     storage = FilesystemAdapter(project_root)
     state_log = StateLog(project_root / "logs" / "state.jsonl")
 
