@@ -149,6 +149,18 @@ def test_claim_tag_rule_mentions_band_and_panel():
     assert "exactly one" in CLAIM_TAG_RULE.lower()
 
 
+def test_claim_tag_rule_specifies_convergence_role_split():
+    """v1.2 smoke surfaced that the funnel arrows point AT the bottom panel, so
+    the bottom panel needs to hold the synthesis takeaway, not the framing.
+    Prompt must instruct the LLM to put the headline aphorism in CLAIM (not THESIS)
+    specifically for convergence posts.
+    """
+    from text_generator import CLAIM_TAG_RULE
+
+    assert "Put the headline aphorism inside <CLAIM>" in CLAIM_TAG_RULE
+    assert "synthesis takeaway" in CLAIM_TAG_RULE.lower()
+
+
 def test_generate_extracts_claim_for_bridge(tmp_path):
     """generate() must populate brief.panel_claim from <CLAIM> for bridge posts."""
     from atom_loader import AtomLoader
