@@ -30,15 +30,18 @@ def test_explicit_pair_uses_typed_claim(atom_source, project_root):
     assert brief.strategy_params.get("connection_type") == "analogical"
 
 
-def test_default_visual_tier_is_diagram(atom_source, project_root):
-    """v1.1: two_atom_bridge defaults to 1_diagram (atom-card handles 2 atoms)."""
+def test_default_visual_tier_is_text(atom_source, project_root):
+    """v1.1.3: bridge defaults to text-only — the atom-card template is the
+    wrong conceptual shape for "connection between two things." User can
+    opt into 1_diagram with --tier=1 if they want the card anyway.
+    """
     ctx = _ctx(atom_source, project_root)
     strategy = TwoAtomBridge()
     brief = strategy.generate_brief(ctx, {
         "atom_a": "sample-concept",
         "atom_b": "third-concept",
     })
-    assert brief.visual_tier == "1_diagram"
+    assert brief.visual_tier == "0_text"
 
 
 def test_same_domain_rejected(atom_source, project_root):
