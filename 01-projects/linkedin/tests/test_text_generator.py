@@ -113,3 +113,126 @@ def test_generate_extracts_thesis_and_strips_tags(tmp_path):
     assert "<THESIS>" not in result.draft_text
     assert "</THESIS>" not in result.draft_text
     assert "The locked thesis sentence." in result.draft_text
+
+
+def test_voice_prompt_does_not_include_claim_rule_for_source_spotlight():
+    """source_spotlight posts should not see the CLAIM rule."""
+    from text_generator import CLAIM_TAG_RULE, _compose_system_prompt
+
+    prompt = _compose_system_prompt(strategy="source_spotlight")
+    assert CLAIM_TAG_RULE not in prompt
+
+
+def test_voice_prompt_includes_claim_rule_for_two_atom_bridge():
+    from text_generator import CLAIM_TAG_RULE, _compose_system_prompt
+
+    prompt = _compose_system_prompt(strategy="two_atom_bridge")
+    assert CLAIM_TAG_RULE in prompt
+
+
+def test_voice_prompt_includes_claim_rule_for_convergence_finder():
+    from text_generator import CLAIM_TAG_RULE, _compose_system_prompt
+
+    prompt = _compose_system_prompt(strategy="convergence_finder")
+    assert CLAIM_TAG_RULE in prompt
+
+
+def test_claim_tag_rule_mentions_band_and_panel():
+    """The rule must explain where the claim renders so the model gets the right tone."""
+    from text_generator import CLAIM_TAG_RULE
+
+    assert "<CLAIM>" in CLAIM_TAG_RULE
+    assert "</CLAIM>" in CLAIM_TAG_RULE
+    assert "two_atom_bridge" in CLAIM_TAG_RULE
+    assert "convergence_finder" in CLAIM_TAG_RULE
+    assert "mechanism" in CLAIM_TAG_RULE.lower()
+    assert "exactly one" in CLAIM_TAG_RULE.lower()
+
+
+def test_generate_extracts_claim_for_bridge(tmp_path):
+    """generate() must populate brief.panel_claim from <CLAIM> for bridge posts."""
+    from atom_loader import AtomLoader
+    from models import AtomRef, PostBrief, Status, utc_now
+    from text_generator import TextGenerator
+
+    class StubBlock:
+        def __init__(self, text):
+            self.text = text
+
+    class StubMessage:
+        def __init__(self, text):
+            self.content = [StubBlock(text)]
+
+    class StubMessages:
+        def create(self, **kwargs):
+            return StubMessage(
+                "Stress is the dose. <THESIS>Stress is not the enemy.</THESIS> "
+                "<CLAIM>Both systems get stronger from controlled stress they can recover from.</CLAIM> "
+                "Find your dose."
+            )
+
+    class StubClient:
+        def __init__(self):
+            self.messages = StubMessages()
+
+    loader = AtomLoader(tmp_path)
+    gen = TextGenerator(client=StubClient(), loader=loader)
+
+    brief = PostBrief(
+        id="t", slug="t",
+        created_at=utc_now(), updated_at=utc_now(),
+        strategy="two_atom_bridge",
+        strategy_params={},
+        atoms_used=[AtomRef(slug="a", role="primary"), AtomRef(slug="b", role="primary")],
+        angle="x",
+        visual_tier="1_diagram",
+        status=Status.DRAFTING,
+    )
+    result = gen.generate(brief)
+    assert result.thesis == "Stress is not the enemy."
+    assert result.panel_claim == "Both systems get stronger from controlled stress they can recover from."
+    assert "<THESIS>" not in result.draft_text
+    assert "<CLAIM>" not in result.draft_text
+
+
+def test_generate_skips_claim_extraction_for_source_spotlight(tmp_path):
+    """source_spotlight briefs leave panel_claim empty even if model emits a CLAIM tag."""
+    from atom_loader import AtomLoader
+    from models import AtomRef, PostBrief, Status, utc_now
+    from text_generator import TextGenerator
+
+    class StubBlock:
+        def __init__(self, text):
+            self.text = text
+
+    class StubMessage:
+        def __init__(self, text):
+            self.content = [StubBlock(text)]
+
+    class StubMessages:
+        def create(self, **kwargs):
+            return StubMessage(
+                "<THESIS>Source spotlight thesis.</THESIS> "
+                "<CLAIM>Stray claim tag the model emitted.</CLAIM>"
+            )
+
+    class StubClient:
+        def __init__(self):
+            self.messages = StubMessages()
+
+    loader = AtomLoader(tmp_path)
+    gen = TextGenerator(client=StubClient(), loader=loader)
+
+    brief = PostBrief(
+        id="t", slug="t",
+        created_at=utc_now(), updated_at=utc_now(),
+        strategy="source_spotlight",
+        strategy_params={},
+        atoms_used=[AtomRef(slug="a", role="primary")],
+        angle="x",
+        visual_tier="1_diagram",
+        status=Status.DRAFTING,
+    )
+    result = gen.generate(brief)
+    assert result.thesis == "Source spotlight thesis."
+    assert result.panel_claim == ""
