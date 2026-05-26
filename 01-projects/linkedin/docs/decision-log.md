@@ -162,7 +162,47 @@ Added Hamilton Helmer to sources.yml (Strategy Capital founder, author of 7 Powe
 ### v1.1.x follow-ups (not blocking merge)
 
 - `--reset-cooldowns` CLI flag for smoke-testing iteration (cooldowns exhausted Rumelt then K&M within 2-3 smokes; iteration loop is hostile without manual JSON editing)
-- Re-test cross-domain strategies (two_atom_bridge, convergence_finder) — only source_spotlight was end-to-end smoked
 - Slug-safety on source slug for filesystem (carryover from v1.0.1 follow-up #3 — still has comma in bundle paths)
+
+---
+
+## 2026-05-26 — v1.1.3: cross-domain strategy smokes + visual revert
+
+### Cross-domain smokes (after v1.1 merged to main)
+
+Ran the other two Tier 1 strategies end-to-end against real atoms:
+
+- **two_atom_bridge:** `antifragile-triad` (mental-models) + `autoregulated-active-recovery` (health-performance). Cross-domain "respond to stress" pair.
+- **convergence_finder:** `--topic=feedback`, which touches 11 different domains in the vault.
+
+Texts on both: strong. Voice prompt v2's source-anchor rule fired correctly when atoms had book-source registry entries; fell back to 3-5 word descriptors otherwise. The engine is producing publish-quality body text across all three Tier 1 strategies.
+
+### The visual mismatch
+
+Visuals on both: **the wrong conceptual shape.** User feedback: "the visuals are really good for the single source or source_spotlight, but they're not as good for the convergence_finder and the two_atom_bridge."
+
+Root cause: the Variant B atom-card template was designed in the brainstorm against the source_spotlight shape — "N atoms from one catalog page." That literally IS a list, so a list visual works. The other two strategies are different conceptual shapes:
+
+- `two_atom_bridge` is about *a connection between two things*. The card flattens that into a bullet list of two items; the bridge structure (relationship, mechanism, analogy) is invisible.
+- `convergence_finder` is about *multiple distant atoms pointing at a shared center*. The card flattens that hub-and-spokes shape into a bullet list; the convergence point itself is invisible.
+
+We chose one visual template for all strategies and only mocked it against the one strategy it matches. Real design hole.
+
+### v1.1.3 patch — text-only defaults for bridge + convergence
+
+Defer the visual fix to a dedicated design cycle (proper strategy-specific visual treatments, separate brainstorm). For now:
+
+- `two_atom_bridge` default `visual_tier` flips back to `0_text`.
+- `convergence_finder` default `visual_tier` flips back to `0_text`.
+- `source_spotlight` unchanged — it still defaults to Tier 1 atom-card.
+- `--tier=1` still opts into the atom-card if the user wants it.
+
+Texts ship as the workhorse for these strategies until v1.x adds proper visuals.
+
+Test impact: positive assertions in `test_two_atom_bridge.py` and `test_convergence_finder.py` updated to assert `"0_text"`. `test_end_to_end.py` reverted to expect empty `visual_asset_paths` for the bridge pipeline (the v1.1 update of that assertion is itself rolled back).
+
+### v1.1.3 follow-up (queued for a later cycle)
+
+- **Strategy-specific visual treatments.** A separate brainstorming session for v1.2 or v1.3. Bridge wants something like side-by-side cards with a connector / shared-mechanism band; convergence wants a hub-and-spokes layout. Different conceptual shape per strategy means different visual primitive.
 
 
