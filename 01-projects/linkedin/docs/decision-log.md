@@ -330,3 +330,66 @@ Commit `6814312`.
 - **Moving-target truncation.** As long as the filler is unreliable, every smoke with fresh atoms can introduce new truncated tldrs. The retry-on-overshoot fix above is the structural answer; until then, the recap script is the maintenance pass.
 - Carryover from v1.2: `--reset-cooldowns` flag, slug-safety, `atom_card.html.j2` migration to shared CSS partial, renderer-side domain validation.
 
+---
+
+## 2026-05-26 — v1.2.2: TldrFiller upgrade + accept aphorism-on-top shape
+
+Two-item follow-up resolving the v1.2.1 structural concerns. Branch `feat/linkedin-engine-v1.2.2`, 2 commits, 114/114 tests pass.
+
+### Item 1: TldrFiller switches to Sonnet + retry-on-overshoot
+
+The v1.2.1 finding was that Haiku consistently overshoots the 80-char cap even with the tightened prompt, producing `…` truncations on ~90% of generations. v1.2.2 fixes this two ways:
+
+- **Default model upgraded** from `claude-haiku-4-5-20251001` to `claude-sonnet-4-6`. Sonnet follows length constraints more reliably; cost per atom rises from ~$0.001 to ~$0.003, still trivial for a vault-scale operation.
+- **Retry-on-overshoot safety net.** If the first response would trigger the truncation safety net (length > 80 chars after cleaning), the filler issues a second call with `RETRY_PROMPT_SUFFIX` ("Rewrite in under 50 characters. Cut every word that is not load-bearing."). The `_pick_better` helper then chooses between the two responses, preferring complete sentences within the cap.
+- New behavior is testable. Five new unit tests in `test_tldr_filler.py` cover: default model is Sonnet, retry fires only on overshoot, retry-call prompt includes the under-50-chars instruction, retry picks the shorter complete sentence, and the safety-net truncation still applies when both responses overshoot (rare).
+
+Cost decision: belt + suspenders rather than either alone. Sonnet is the primary; retry catches the tail.
+
+Commit `0c35004`.
+
+### Item 2: Remove CONVERGENCE_THESIS_OVERRIDE
+
+The v1.2.1 override was meant to push the THESIS into a framing-observation role for convergence posts. In practice the LLM's bias toward "aphorism in THESIS" was strong enough that the override competed without winning. User accepted "aphorism on top, synthesis below" as the natural convergence layout in the v1.2.1 close.
+
+The override is deleted in v1.2.2. `CLAIM_TAG_RULE` alone is sufficient to keep framing-lines out of the CLAIM slot, which was the original v1.2 fix. The two v1.2.1 tests asserting the override exists are removed and replaced with one test that asserts the override has been removed and the convergence prompt is exactly `VOICE_SYSTEM_PROMPT + CLAIM_TAG_RULE`.
+
+Commit `6415c14`.
+
+### v1.2.2 smoke
+
+Ran `convergence_finder --topic=feedback` via `./bin/draft-post`. The strategy picked three atoms with no existing tldrs (`shallowing-hypothesis`, `npd-for-ai`, `door-shut-door-open`), which exercised the Sonnet-driven filler end-to-end.
+
+Sonnet results (all three first-try, no retries fired):
+- `shallowing-hypothesis`: "Habitual scrolling trains shallow processing that undermines deep reading." (75 chars)
+- `npd-for-ai`: "AI product development adapts classic NPD steps for ML data and modeling needs." (80 chars exact)
+- `door-shut-door-open`: "Draft alone first, then revise with audience feedback in mind." (62 chars)
+
+All complete sentences within cap. No `…`. Funnel cards rendered clean.
+
+THESIS: "Every creative discipline eventually invents a protocol for when the door opens." (aphorism, at top)
+CLAIM: "Feedback is a dosage problem, not a quality problem." (synthesis, in panel)
+
+User feedback: "visually looks great. the text slumped me. it's not bad i just didnt get it."
+
+### The text-coherence finding (NOT a v1.2.2 issue)
+
+The user's "didn't get the message" feedback surfaced a real concern that is upstream of the engine: `convergence_finder` picks atoms by tag overlap, not by semantic coherence. The three `feedback`-tagged atoms came from substantially different domains (attention/scrolling, AI product methodology, creative drafting workflow) and represented different *kinds* of feedback. The LLM strained to find a meta-synthesis ("feedback is a dosage problem") that fit all three, producing text that reads strained because the underlying convergence is strained.
+
+Side observation: the CLAIM used contrastive framing ("dosage problem, *not* a quality problem"), which is exactly what the v1.0.1 voice linter rule catches. We force-bypassed during smoke; an actual post would require editing.
+
+These are strategy-design concerns, not engine bugs. v1.2.2 ships with the engine improvements intact.
+
+### Final state
+
+- Branch: `feat/linkedin-engine-v1.2.2` with 2 commits.
+- Tests: 114/114 pass (110 from v1.2.1 + 5 new TldrFiller + 1 new THESIS-override-removed minus 2 v1.2.1 override tests).
+- Engine: TldrFiller default is Sonnet with retry; CONVERGENCE_THESIS_OVERRIDE removed.
+- Vault: 3 newly-touched atoms (`shallowing-hypothesis`, `npd-for-ai`, `door-shut-door-open`) gained clean Sonnet-generated tldrs during smoke.
+
+### v1.2.3+ follow-ups (not blocking)
+
+- **Convergence atom-coherence scoring.** Tag overlap is necessary but not sufficient. Options: embed atoms and require minimum cosine similarity across the chosen trio; or require LLM-judged coherence after candidate selection; or curate topic-to-atom-set mappings for the topics worth posting about. v1.3 territory.
+- **Voice linter prompt-time reinforcement.** Contrastive framing rule is in the prompt and the linter catches violations post-hoc, but the model still produces them ~10% of the time. Consider a CLAIM-specific reinforcement that re-states the prohibition right where the synthesis sentence lands.
+- Carryover from v1.2.1: `--reset-cooldowns` flag, slug-safety, `atom_card.html.j2` migration to shared CSS partial, renderer-side domain validation.
+
