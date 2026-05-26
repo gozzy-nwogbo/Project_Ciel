@@ -48,8 +48,7 @@ OUTPUT:
 - Target word count provided in the user prompt — stay in range.
 """
 
-CLAIM_TAG_RULE = """
-CLAIM TAG (strategy-scoped, two_atom_bridge and convergence_finder only):
+CLAIM_TAG_RULE = """CLAIM TAG (strategy-scoped, two_atom_bridge and convergence_finder only):
 - This post must contain exactly one synthesizing sentence wrapped in <CLAIM>...</CLAIM> tags.
 - For two_atom_bridge: the shared-mechanism sentence. It will render as the italic line inside the mechanism band beneath the two atom pillars.
 - For convergence_finder: the unified-mechanism sentence. It will render as the italic line inside the convergence panel beneath the funnel.
@@ -130,6 +129,9 @@ class TextGenerator:
         brief.thesis = extraction.thesis
         brief.draft_text = extraction.clean_body.strip()
 
+        brief.updated_at = utc_now()
+        brief.status = Status.TEXT_READY
+
         if brief.strategy in _CLAIM_STRATEGIES:
             from linter.tagged import extract_tagged
             claim_result = extract_tagged(extraction.clean_body, "CLAIM")
@@ -143,8 +145,6 @@ class TextGenerator:
                     "note": claim_result.warning,
                 })
 
-        brief.status = Status.TEXT_READY
-        brief.updated_at = utc_now()
         brief.status_history.append({
             "status": Status.TEXT_READY.value,
             "timestamp": brief.updated_at.isoformat(),
