@@ -13,9 +13,16 @@ for full design.
 
 - `src/` — Python implementation
   - `strategies/` — atom selection → PostBrief
-  - `renderers/` — PostBrief → visual asset (Tier 1 only in v1.0)
+  - `renderers/` — PostBrief → visual asset. As of v1.2, three Tier 1 renderers behind a registry:
+    - `atom_card.py` — source_spotlight, 1:1 canvas
+    - `bridge_card.py` — two_atom_bridge, 4:5 canvas, pillars + mechanism band
+    - `convergence_card.py` — convergence_finder, 4:5 canvas, funnel + convergence panel
+    - `registry.py` — `for_strategy(strategy_name, **kwargs)` dispatches to the right class
+    - `templates/_card_frame.css.j2` — shared CSS partial for bridge + convergence (atom_card still inlines its own CSS)
   - `storage/` — bundle persistence (filesystem in v1.0)
   - `linter/` — voice rule enforcement
+    - `tagged.py` — generic `<TAG>...</TAG>` extractor (v1.2)
+    - `thesis.py` — thin wrapper over `tagged.extract_tagged(body, "THESIS")`
   - `usage/` — cooldown tracking + scoring
   - `cli/` — `/draft-post` and `/linkedin-status` entry points
 - `tests/` — pytest suite
@@ -28,6 +35,8 @@ for full design.
 
 - All Python code is type-hinted. Pyright-strict where feasible.
 - Voice rules enforced via `src/linter/rules.yml`. Edit YAML, not code.
+- Per-strategy visual aspect ratios (v1.2): source_spotlight = 1:1; two_atom_bridge = 4:5; convergence_finder = 4:5. Strategies set `aspect_ratio` on the brief; renderers validate it.
+- Voice prompt v3 (v1.2) requires `<THESIS>...</THESIS>` universally and `<CLAIM>...</CLAIM>` for two_atom_bridge + convergence_finder only. The text generator strips both tag pairs from the saved `post.md`.
 - State transitions ALWAYS go through the storage adapter, never direct JSON writes.
 - Atom source path is configurable: defaults to `../../02-knowledge/` relative to project root.
 - When extracted from the vault, point the atom source config at any directory of atom markdown files.
