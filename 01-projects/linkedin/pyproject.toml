@@ -20,3 +20,6 @@ dev = [
 testpaths = ["tests"]
 python_files = "test_*.py"
 addopts = "-v --tb=short"
+markers = [
+    "smoke: live Playwright render tests (slow)",
+]
