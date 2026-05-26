@@ -205,4 +205,72 @@ Test impact: positive assertions in `test_two_atom_bridge.py` and `test_converge
 
 - **Strategy-specific visual treatments.** A separate brainstorming session for v1.2 or v1.3. Bridge wants something like side-by-side cards with a connector / shared-mechanism band; convergence wants a hub-and-spokes layout. Different conceptual shape per strategy means different visual primitive.
 
+---
+
+## 2026-05-26 — v1.2: strategy-specific visuals + smoke
+
+### What shipped
+
+v1.2 absorbed the v1.1.3 follow-up: strategy-specific Tier 1 visuals for `two_atom_bridge` and `convergence_finder`, both at 4:5 (1080x1350). `source_spotlight` is unchanged. The visual family stays coherent (terracotta accent, Geist font, shared meta-row + footer) but each strategy now gets a template that matches its conceptual shape.
+
+- **Bridge A:** two atom pillars side-by-side, dashed-border mechanism band beneath carrying the `panel_label` (derived from connection type) and `panel_claim` (italic synthesis sentence from `<CLAIM>` tag).
+- **Convergence C:** three funnel atom cards across the top, three downward arrows, solid-border convergence panel at the bottom carrying `CONVERGES ON · {TOPIC}` label and `panel_claim` synthesis.
+
+Architecturally, the renderer codebase split from one class into three sibling renderers behind a small Tier 1 registry. PostBrief gained three additive fields (`aspect_ratio`, `panel_label`, `panel_claim`). Voice prompt v3 adds a strategy-scoped `<CLAIM>...</CLAIM>` tag for the two new strategies; THESIS rule still applies universally.
+
+### Plan execution
+
+Brainstorm produced `2026-05-26-strategy-visuals-design.md`; plan in `2026-05-26-v1-2-implementation-plan.md`. Executed via subagent-driven development: 14 tasks plus 4 follow-up fix commits from quality reviews and smoke iteration. Test count grew from 69 baseline to 108 passing at branch tip.
+
+Selected commits worth flagging:
+- `4c1c636` PostBrief schema deltas.
+- `25138d7` Generalized `extract_thesis` into tag-agnostic `linter.tagged.extract_tagged`.
+- `e27ec75` + `d440944` + `3c10987` Voice prompt v3 with strategy-scoped CLAIM rule; tightened CLAIM prompt boundary, timestamp consistency, and em-dash scrub during quality-review fix loop.
+- `5055311` + `8139f24` Bridge strategy update with quality-review fixes (real-fallback test instead of dict.get truism; Playwright importorskip on e2e).
+- `de90981` Convergence strategy update.
+- `4a5a16c` + `9a15fd3` BridgeCardRenderer and ConvergenceCardRenderer with live Playwright smoke tests.
+- `8936b5e` Convergence CLAIM rule tightening (post-first-smoke iteration; see "Smoke" below).
+- `3f1a909` Convergence funnel-atom char cap raised 60 to 80 (post-second-smoke iteration).
+
+### Bridge smoke (user-run)
+
+Strategy: `two_atom_bridge` on `antifragile-triad` (mental-models) + `autoregulated-active-recovery` (health-performance). Same pair as v1.1.3 cross-domain smoke; connection cooldown was clear because v1.1.3 only generated text-only briefs against this pair.
+
+Text: clean. Voice prompt v3's CLAIM rule produced a coherent shared-mechanism sentence wrapped in `<CLAIM>` tags. THESIS sat at the top of the card as an aphorism. Body stripped both tag pairs cleanly.
+
+Visual: ships well. Two pillars rendered at proper proportion, mechanism band sits cleanly beneath, footer reads `2 atoms · cross-domain` + `two-atom-bridge`. User feedback: "shipped a clean visual." Minor visual note from user: the meta-row text `bridge // mental-models × health-performance` sits less neatly than convergence's shorter equivalent, but acceptable.
+
+### Convergence smoke iteration
+
+**First convergence smoke:** layout was right but the text role split was inverted. The LLM put the synthesis takeaway in THESIS (top of card, aphorism slot) and the framing observation in CLAIM (bottom convergence panel). The funnel arrows visually point AT the bottom panel, implying that's the conclusion, so a framing sentence there reads backwards. User feedback called this out: the three-atoms-surfaced framing belongs at the top; the synthesis takeaway belongs in the panel.
+
+Root cause: the v1.2 CLAIM rule said "unified-mechanism sentence" which the LLM interpreted as the takeaway, and the universal THESIS rule "Treat the tagged sentence as a standalone aphorism" pulled the aphorism into the top slot. Two rules both pointed the aphorism upward.
+
+**Patch (commit `8936b5e`):** tightened the convergence-specific CLAIM rule to make the role split explicit. For convergence posts, THESIS = framing/observation; CLAIM = synthesis takeaway; "Put the headline aphorism inside <CLAIM>, not <THESIS>." Added `test_claim_tag_rule_specifies_convergence_role_split` to lock the new prompt language.
+
+**Second convergence smoke:** improvement. The CLAIM slot now correctly holds a synthesis sentence ("A demo, a label, and a stated task are the same tool..."). The THESIS slot still pulled an aphorism rather than the explicit framing line, but at a different abstraction level (general aphorism on top, atom-specific synthesis in panel). User feedback: "the thesis/claim pairing works."
+
+Funnel atom cards: two of three rendered complete sentences. The third (Drucker "Knowledge Worker Productivity") was truncated mid-sentence. Investigation: the atom's `tldr` field in the vault is itself pre-truncated (`tldr: Knowledge work productivity measures quality output from self-directed…`). The 80-char cap can't recover what's already baked into the source file. Data hygiene, not engine bug. Two of three atoms shipped clean.
+
+**Patch (commit `3f1a909`):** funnel-atom char cap raised from 60 to 80 to match the v1.1.1 filler hard-cap. Two of three atoms now render full sentences end-to-end.
+
+Final user feedback: "all in all, this is a much better run than the last one... good job."
+
+### Final state
+
+- Branch: `feat/linkedin-engine-v1.2` with 18 commits (14 plan tasks + 4 fix commits from reviews and smoke).
+- Tests: 108/108 pass, including live Playwright render smokes for bridge and convergence.
+- All three Tier 1 renderers active behind `tier1_registry.for_strategy(...)`; `source_spotlight` unchanged.
+- visual-discipline skill updated with per-strategy rule blocks; stale SVG-output line removed.
+- PostBrief schema additive (aspect_ratio, panel_label, panel_claim); old briefs on disk deserialize with safe defaults.
+
+### v1.2 follow-ups (queued, not blocking merge)
+
+- **Truncated tldrs in vault atoms.** Pre-v1.1.1 atoms have tldrs already saved with trailing ellipsis (the renderer cap can't recover them). Either run the tldr-filler over the corpus with a tighter complete-sentence prompt and back-write the fixes, or add funnel-atom auto-shrink so longer text fits without truncation. Prefer the former since it benefits all renderers, not just convergence.
+- **Convergence THESIS still pulls aphorism.** The strategy-scoped CLAIM rule moved the synthesis into the panel correctly, but the universal THESIS rule "Treat the tagged sentence as a standalone aphorism" still anchors the top slot. To get the explicit framing line at the top, the THESIS rule itself needs to become strategy-aware (a `_compose_system_prompt` extension or a per-strategy prompt assembly). One more iteration would lock it.
+- **`atom_card.html.j2` still inlines its CSS** rather than including `_card_frame.css.j2`. Deferred from the spec to avoid source_spotlight regression risk during v1.2. Migrate after smoke confirms parity.
+- **CLI friction.** Manual env-var prefixes (`PYTHONPATH=src`, `LINKEDIN_ATOM_SOURCE=...`, etc.) make every CLI invocation a five-line paste. The existing `/draft-post` slash command wrapper should be the daily driver; smoke runs in this cycle should have used it from the start. Document and adopt.
+- **`--reset-cooldowns` CLI flag** carryover from v1.1.x. Still hostile to iterate smokes without manual JSON editing of `state/atom-usage.json` and `state/connection-usage.json`.
+- **Slug-safety on source slug** carryover from v1.0.1 + v1.1.x. Commas in bundle paths still present.
+- **Atom domain validation in renderer.** Spec §6.4 called for `BridgeCardRenderer.validate()` to check "atoms in different domains" and `ConvergenceCardRenderer.validate()` to check "≥3 distinct domains." Both checks live upstream in the strategy code instead. Renderer is not self-protecting against hand-crafted same-domain briefs.
 
