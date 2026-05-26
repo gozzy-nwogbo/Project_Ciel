@@ -18,13 +18,15 @@ TLDR_MAX_CHARS = 80
 SYSTEM_PROMPT = """You distill a knowledge atom into one short sentence.
 
 Hard requirements (these are not aspirational, they are limits):
-- ONE sentence.
-- Under 80 characters total, including the period.
+- ONE complete sentence ending in a period.
+- Target 60 characters. Hard cap 80 characters total, including the period.
 - Stands alone for a cold reader who has never seen this atom.
 - Captures the core mechanism or claim, not metadata about the atom.
 - Plain text only. No quotes, no markdown, no preamble.
 
-If your first draft exceeds 80 characters, rewrite it shorter before responding.
+Process: draft the sentence. Count characters. If over 60, rewrite shorter.
+If over 80, rewrite again. Aim for the shortest complete sentence that still
+conveys the mechanism. Better to land at 50 characters than 79.
 """
 
 
