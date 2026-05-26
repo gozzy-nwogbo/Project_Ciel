@@ -136,6 +136,44 @@ def test_missing_tldr_triggers_filler_when_provided(brand_spec):
     filler.fill.assert_called_once()
 
 
+def test_over_long_tldr_is_truncated_at_render_time(brand_spec):
+    """Safety net: atom tldrs longer than 80 chars get truncated with ellipsis."""
+    long_tldr = (
+        "A four-quadrant grid that forces simultaneous examination of what to "
+        "eliminate, reduce, raise, and create in your value proposition."
+    )
+    loader = MagicMock()
+    loader.load_one.side_effect = lambda s: _atom(s, tldr=long_tldr)
+    renderer = AtomCardRenderer(
+        loader=loader,
+        sources_registry=MagicMock(),
+        brand_spec_path=brand_spec,
+        tldr_filler=None,
+    )
+    brief = _brief(["a"])
+    ctx = renderer._build_template_context(brief)
+    text = ctx["atom_blocks"][0]["text"]
+    assert text is not None
+    assert len(text) <= 80
+    assert text.endswith("…")
+
+
+def test_thesis_font_size_shrinks_when_long(brand_spec):
+    """Thesis under 60 chars uses large font; over 60 chars shrinks to small."""
+    loader = MagicMock()
+    loader.load_one.side_effect = lambda s: _atom(s, tldr="t")
+    renderer = AtomCardRenderer(
+        loader=loader,
+        sources_registry=MagicMock(),
+        brand_spec_path=brand_spec,
+        tldr_filler=None,
+    )
+    short = _brief(["a"], thesis="Short thesis.")  # 13 chars
+    long = _brief(["a"], thesis="A long-ish thesis sentence that crosses the sixty character mark for sure.")  # ~74
+    assert renderer._build_template_context(short)["thesis_font_size"] == "78px"
+    assert renderer._build_template_context(long)["thesis_font_size"] == "60px"
+
+
 def test_missing_tldr_and_no_filler_renders_name_only(brand_spec):
     loader = MagicMock()
     loader.load_one.side_effect = lambda s: _atom(s, tldr=None)

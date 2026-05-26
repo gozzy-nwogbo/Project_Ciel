@@ -14,6 +14,24 @@ from renderers.base import RenderResult, load_brand_spec
 
 _TEMPLATE_DIR = Path(__file__).parent / "templates"
 
+# Visual budget caps — keep the 1080×1080 canvas safe even if upstream
+# tldrs or thesis lines overshoot.
+_ATOM_TEXT_MAX_CHARS = 80
+_THESIS_LARGE_MAX_CHARS = 60       # ≤60 chars uses 78px (2-line fit)
+_THESIS_LARGE_FONT = "78px"
+_THESIS_SMALL_FONT = "60px"
+
+
+def _truncate_at_word_boundary(text: str, max_chars: int) -> str:
+    """Truncate to max_chars at the last whitespace boundary, append ellipsis."""
+    if len(text) <= max_chars:
+        return text
+    cut = text[: max_chars - 1].rstrip()
+    space = cut.rfind(" ")
+    if space > 0:
+        cut = cut[:space]
+    return cut.rstrip(",;:.") + "…"
+
 
 class AtomCardRenderer:
     tier = 1
@@ -88,6 +106,8 @@ class AtomCardRenderer:
             atom = self.loader.load_one(ref.slug)
             name = atom.title if atom else ref.slug
             tldr = (atom.tldr if atom else None) or self._fill_tldr(atom)
+            if tldr:
+                tldr = _truncate_at_word_boundary(tldr, _ATOM_TEXT_MAX_CHARS)
             atom_blocks.append({"name": name, "text": tldr})
 
         overflow_line = None
@@ -120,6 +140,11 @@ class AtomCardRenderer:
         atom_count = len(refs)
         footer_right = f"{atom_count} atom{'s' if atom_count != 1 else ''} · {brief.strategy.replace('_', '-')}"
 
+        thesis_font_size = (
+            _THESIS_LARGE_FONT if len(brief.thesis) <= _THESIS_LARGE_MAX_CHARS
+            else _THESIS_SMALL_FONT
+        )
+
         return {
             "colors": {
                 "background": colors.get("background", "#FAF8F5"),
@@ -133,6 +158,7 @@ class AtomCardRenderer:
             },
             "domain_tag": domain_tag,
             "thesis": brief.thesis,
+            "thesis_font_size": thesis_font_size,
             "atom_blocks": atom_blocks,
             "overflow_line": overflow_line,
             "source_slug": source_slug,
