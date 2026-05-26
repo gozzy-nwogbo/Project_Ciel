@@ -33,16 +33,13 @@ Fire automatically when:
 
 1. **Load brand-spec.** Parse the YAML block. If missing or unparseable, halt and surface error.
 2. **Validate brief against tier rules:**
-   - Tier 1: ≤6 nodes, every node has ≥1 edge, aspect ratio 1:1 or 4:5.
+   - Tier 1: ≤3 distilled atom blocks (4+ atoms apply overflow rule); non-empty thesis (extracted from `<THESIS>` or first-sentence fallback); `tldr` resolved for each shown atom (front-matter or LLM fill succeeded); source slug present in footer; aspect ratio 1:1.
    - Tier 2: ≤8 slides, ≤50 words/slide, ≤9 augmented images.
    - Tier 3: ≤12 total asset refs, ≤15s duration, 720p, body text always present.
 3. **Run anti-pattern checks:**
    - No center-radial-gradient backgrounds.
    - No drop shadows on graph nodes.
    - No all-caps body labels.
-   - No more than 6 atoms in a single diagram.
-   - Connection-type edge labels mandatory when `connection_type ≠ general`.
-   - No floating nodes (every node has ≥1 edge).
 4. **Invoke renderer.** Pass brand tokens explicitly; renderer must not invent colors or fonts.
 5. **Post-render verification.**
    - Output file(s) exist and are non-empty.
@@ -57,36 +54,37 @@ Fire automatically when:
 | No center-radial-gradient | Generic AI aesthetic; instantly readable as generated |
 | No drop shadows on nodes | Adds visual noise without information |
 | No all-caps body labels | Reads as marketing-deck, not analytical |
-| Max 6 nodes per diagram | Cognitive load; Miller's 7±2 minus margin |
-| Edge labels when typed | Untyped edges are weakest connection-graph signal |
-| Aspect ratio 1:1 or 4:5 | LinkedIn-feed display optimization |
+| ≤3 distilled atoms per card | Cognitive load on a 1:1 LinkedIn feed image |
+| Non-empty thesis | Card needs a hero line for scroll-stop |
+| Source slug in footer | "Visible system" payload must be present |
+| Aspect ratio 1:1 | LinkedIn-feed display optimization |
 
 ## Examples
 
-### Example 1 — Tier 1 diagram approval
+### Example 1 — Tier 1 atom-card approval
 
-Input: `brief` with 3 atoms, 2 typed connections, visual_tier=1_diagram.
-Brand-spec: teal accent, Geist font.
+Input: `brief` with 3 atoms (each with `tldr` in front-matter), thesis="Strategy is problem-shaped, not goal-shaped.", visual_tier=1_diagram.
+Brand-spec: terracotta accent, Geist font.
 
 Process:
 1. Load brand-spec → confirm `colors.accent_primary` exists.
-2. Validate: 3 nodes ✓, edge count ≥ nodes-1 ✓, aspect 1:1 ✓.
+2. Validate: 3 atoms ≤ 3 ✓, thesis non-empty ✓, all atoms have tldr ✓, source slug present ✓, aspect 1:1 ✓.
 3. Anti-patterns: no shadows used ✓, labels mixed-case ✓.
-4. Renderer outputs PNG + SVG.
-5. Verify both files exist, PNG is 1080×1080 px.
+4. Renderer outputs PNG.
+5. Verify file exists, PNG is 1080×1080 px.
 6. Write checks file.
 
 Output: `visual-checks.json` with `{"passed": true, "checks": [...]}`.
 
-### Example 2 — Tier 1 rejection
+### Example 2 — Tier 1 rejection (empty thesis)
 
-Input: brief with 8 atoms.
+Input: brief with 3 atoms but `brief.thesis == ""` (extraction fell back to empty, body had no usable first sentence).
 
 Process:
-1. Validate: 8 nodes > 6 → FAIL.
+1. Validate: thesis empty → FAIL.
 2. Return validation error before invoking renderer.
 
-Output: error surfaced to user; renderer not invoked.
+Output: error surfaced to user; renderer not invoked; bundle stays in gate1_approved with a logged warning.
 
 ## Output contract
 

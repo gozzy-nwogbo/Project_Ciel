@@ -1,10 +1,13 @@
 """Text generator — Claude API call constrained by voice rules."""
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any, Optional
 
 from atom_loader import AtomLoader
 from models import PostBrief, Status, utc_now
+
+if TYPE_CHECKING:
+    from sources.registry import SourcesRegistry
 
 
 VOICE_SYSTEM_PROMPT = """You write LinkedIn posts in the author's voice.
@@ -26,11 +29,19 @@ VOICE:
 - One observation, evidence from the atoms, named takeaway.
 - End with a question or an invitation when natural. No forced CTAs.
 
-COLD READER ANCHOR:
+COLD READER ANCHOR (source-type-aware):
 - Assume the reader has never heard of the source author or the concepts you name.
 - The first time you reference a concept from an atom, anchor it with a 5-to-8-word inline definition or context cue. Example: not "Chain-Link Systems are tricky" but "Chain-Link Systems, where the weakest link caps the whole, are tricky."
-- If you name a source author, place them in 3-5 words. Example: "Rumelt, the strategy researcher," not "Rumelt."
+- For source authors, anchor depends on source type (provided in the user prompt under "Source anchors"):
+  - type: book → On first reference, introduce the author using the full bio sentence provided. Example: "Reading three atoms from Richard Rumelt, a UCLA strategy professor and author of Good Strategy / Bad Strategy, a pattern surfaced."
+  - type: video | podcast | post → On first reference, use a 3-5 word descriptor.
+  - source type not provided → Use a 3-5 word descriptor as fallback.
 - The post must stand alone for a cold LinkedIn reader who has not been following any prior posts.
+
+THESIS LINE:
+- The post must contain exactly one thesis sentence wrapped in <THESIS>...</THESIS> tags.
+- Treat the tagged sentence as a standalone aphorism — it will be rendered as the visual's hero line.
+- Place the tags where the sentence reads naturally in the body. It is part of the post, not a header.
 
 OUTPUT:
 - Plain text only. No headers, no markdown.
@@ -39,19 +50,43 @@ OUTPUT:
 
 
 class TextGenerator:
-    def __init__(self, client: Any, loader: AtomLoader, model: str = "claude-opus-4-7"):
+    def __init__(
+        self,
+        client: Any,
+        loader: AtomLoader,
+        model: str = "claude-opus-4-7",
+        sources_registry: Optional["SourcesRegistry"] = None,
+    ):
         self.client = client
         self.loader = loader
         self.model = model
+        self.sources_registry = sources_registry
 
     def generate(self, brief: PostBrief, target_word_range: tuple[int, int] = (80, 200)) -> PostBrief:
+        from linter.thesis import extract_thesis
+
         atom_summaries = []
+        source_anchors: list[str] = []
+        seen_sources: set[str] = set()
         for ref in brief.atoms_used:
             atom = self.loader.load_one(ref.slug)
-            if atom:
-                snippet = (atom.body or "").strip().replace("\n", " ")[:240]
-                atom_summaries.append(f"- [{atom.title}] ({atom.domain or 'no-domain'}): {snippet}")
+            if not atom:
+                continue
+            snippet = (atom.body or "").strip().replace("\n", " ")[:240]
+            atom_summaries.append(f"- [{atom.title}] ({atom.domain or 'no-domain'}): {snippet}")
+            src = atom.source or atom.origin
+            if src and src not in seen_sources and self.sources_registry is not None:
+                seen_sources.add(src)
+                entry = self.sources_registry.lookup(src)
+                if entry is None:
+                    source_anchors.append(f"- {src}: type=unknown (fall back to 3-5 word descriptor)")
+                elif entry.type == "book" and entry.author_bio:
+                    source_anchors.append(f"- {src}: type=book, bio=\"{entry.author_bio}\"")
+                else:
+                    source_anchors.append(f"- {src}: type={entry.type}")
+
         atoms_block = "\n".join(atom_summaries) or "(no atom summaries available)"
+        sources_block = "\n".join(source_anchors) if source_anchors else "(no source entries available)"
 
         lo, hi = target_word_range
         user_prompt = (
@@ -59,9 +94,11 @@ class TextGenerator:
             f"  {brief.angle}\n\n"
             f"Use these atoms as substance:\n\n"
             f"{atoms_block}\n\n"
+            f"Source anchors:\n\n"
+            f"{sources_block}\n\n"
             f"Target word count: {lo}-{hi}.\n"
             f"Name 'my second brain' or 'the atom graph' as the source of the observation.\n"
-            f"Plain text only — no markdown, no headers."
+            f"Plain text only — no markdown, no headers. Remember the THESIS tag rule."
         )
 
         response = self.client.messages.create(
@@ -72,12 +109,15 @@ class TextGenerator:
         )
         text = "".join(block.text for block in response.content if hasattr(block, "text"))
 
-        brief.draft_text = text.strip()
+        extraction = extract_thesis(text.strip())
+        brief.thesis = extraction.thesis
+        brief.draft_text = extraction.clean_body.strip()
         brief.status = Status.TEXT_READY
         brief.updated_at = utc_now()
         brief.status_history.append({
             "status": Status.TEXT_READY.value,
             "timestamp": brief.updated_at.isoformat(),
             "actor": "engine",
+            "note": extraction.warning or "",
         })
         return brief
