@@ -19,6 +19,7 @@ class Atom:
     domain: Optional[str] = None
     origin: Optional[str] = None
     source: Optional[str] = None
+    tldr: Optional[str] = None
     path: Optional[Path] = None
     # connection-specific
     from_atom: Optional[str] = None
@@ -67,6 +68,7 @@ class AtomLoader:
             domain=meta.get("domain"),
             origin=meta.get("origin"),
             source=meta.get("source"),
+            tldr=meta.get("tldr"),
             path=path,
             from_atom=meta.get("from"),
             to_atom=meta.get("to"),

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 1080px; height: 1080px;
+      background: {{ colors.background }};
+      font-family: {{ typography.body }};
+      color: {{ colors.text_primary }};
+      -webkit-font-smoothing: antialiased;
+    }
+    .card {
+      width: 1080px; height: 1080px;
+      padding: 90px 86px;
+      display: flex; flex-direction: column;
+    }
+    .meta-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 56px;
+    }
+    .meta {
+      font-size: 28px;
+      color: {{ colors.accent_primary }};
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .domain {
+      font-size: 28px;
+      color: {{ colors.text_secondary }};
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: {{ typography.mono }};
+    }
+    .thesis {
+      font-size: {{ thesis_font_size }};
+      font-weight: 500;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      color: {{ colors.text_primary }};
+      margin-bottom: 64px;
+    }
+    .atoms { margin-bottom: auto; }
+    .atom-block { margin-bottom: 36px; }
+    .atom-block:last-child { margin-bottom: 0; }
+    .atom-name {
+      font-size: 32px;
+      font-weight: 600;
+      color: {{ colors.text_primary }};
+      margin-bottom: 8px;
+      display: flex; align-items: baseline; gap: 18px;
+    }
+    .atom-name::before {
+      content: ""; width: 14px; height: 14px;
+      background: {{ colors.accent_primary }};
+      border-radius: 50%;
+      flex-shrink: 0;
+      transform: translateY(-2px);
+    }
+    .atom-text {
+      font-size: 30px;
+      line-height: 1.4;
+      color: {{ colors.text_secondary }};
+      padding-left: 32px;
+    }
+    .overflow-line {
+      margin-top: 18px;
+      font-size: 26px;
+      color: {{ colors.accent_primary }};
+      font-family: {{ typography.mono }};
+      letter-spacing: 0.05em;
+      padding-left: 32px;
+    }
+    .footer-row {
+      margin-top: 56px;
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 26px;
+      font-family: {{ typography.mono }};
+      letter-spacing: 0.02em;
+      gap: 24px;
+    }
+    .footer-source, .footer-count { white-space: nowrap; }
+    .footer-source { color: {{ colors.text_primary }}; }
+    .footer-count { color: {{ colors.text_secondary }}; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="meta-row">
+      <div class="meta">from second brain</div>
+      <div class="domain">{{ domain_tag }}</div>
+    </div>
+    <div class="thesis">{{ thesis }}</div>
+    <div class="atoms">
+      {% for atom in atom_blocks %}
+      <div class="atom-block">
+        <div class="atom-name">{{ atom.name }}</div>
+        {% if atom.text %}<div class="atom-text">{{ atom.text }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      {% if overflow_line %}
+      <div class="overflow-line">{{ overflow_line }}</div>
+      {% endif %}
+    </div>
+    <div class="footer-row">
+      <div class="footer-source">{{ source_slug }}</div>
+      <div class="footer-count">{{ footer_right }}</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -111,4 +111,58 @@ python3 -m cli.draft_post --advance <new-slug>
 
 Expected: post text now includes inline anchors for Rumelt and the concept names; advance prints "WARNING: Tier 1 diagram skipped" because the new Rumelt atoms also have no connection atoms among them. Result: a shippable text post, no broken diagram.
 
+---
+
+## 2026-05-26 — v1.1 implementation complete + smoke result
+
+v1.1 shipped per `2026-05-25-tier1-redesign-design.md`. Replaces graphviz network-diagram Tier 1 renderer with a Playwright-driven HTML/CSS atom-card renderer; bundles source-type-aware cold-reader anchoring. 14-task plan executed inline (after the first Haiku subagent thrashed on autocompact in the same failure mode as the v1.0 session — confirms the "mechanical tasks shouldn't be subagent-delegated in this environment" learning).
+
+### v1.1.0 (initial implementation)
+
+13 commits on `feat/linkedin-engine-v1.1`: dependency swap (Playwright + Jinja2 replace graphviz), atom v2.2 `tldr` field, sources.yml registry, TldrFiller, THESIS extraction, voice prompt v2, atom-card template, AtomCardRenderer (Playwright headless Chromium → 1080×1080 PNG), CLI integration, strategy default flips (two_atom_bridge + convergence_finder back to Tier 1), visual-discipline skill update, graphviz deletion. 64/64 tests pass.
+
+### v1.1 smoke (W. Chan Kim & Renee Mauborgne, 2014)
+
+First Rumelt smoke failed at strategy stage — 6 of 8 Rumelt atoms in primary cooldown from the v1.0 / v1.0.1 smokes. Switched to W. Chan Kim & Renee Mauborgne after adding them to `sources.yml`.
+
+**Text:** Voice prompt v2 worked. Body opened "Three atoms from W. Chan Kim and Renée Mauborgne, INSEAD strategy professors and co-authors of Blue Ocean Strategy, sat next to each other in my second brain this morning." — full book-bio anchor fired as designed. Thesis line ("A good strategy tool isn't a prompt, it's a place you can't hide.") extracted from `<THESIS>` tags cleanly, tags stripped from saved post.md.
+
+**Diagram:** Layout correct, brand tokens right (terracotta + cream + Geist), atom blocks rendered properly. But third atom block (Four Actions Framework) cut off bottom of canvas because TldrFiller produced ~200-char distillations despite the "ideally under 80" prompt — and those got back-written to atom files.
+
+### v1.1.1 patches (in-branch)
+
+- **TldrFiller hard 80-char cap.** Dropped "ideally" wording, reduced max_tokens from 120 to 40, added post-process truncation at word boundary with ellipsis. Two new tests.
+- **Renderer safety net.** atom.tldr truncated at 80 chars in `_build_template_context` so stale or hand-authored over-long tldrs can't overflow. Tested.
+- **Thesis auto-shrink.** Thesis font drops from 78px to 60px when sentence exceeds 60 chars, keeping it to 2 lines instead of 3. Tested.
+- **Atom file cleanup.** Trimmed the 3 K&M atoms' bloated tldrs in-place (errc-grid, strategy-canvas, four-actions-framework) to under 80 chars each.
+
+### v1.1.1 smoke
+
+Six K&M atoms now cooled down from cumulative smokes; engine picked Six Paths Framework, Price Corridor of the Target Mass, Pioneer-Migrator-Settler Map. Diagram fit cleanly. Text was solid. User feedback: "Both are much better. We're getting closer to what I consider good. The visuals are solid."
+
+Two minor footer issues surfaced:
+1. Footer left wrapped onto 2 lines because source slug "W. Chan Kim & Renee Mauborgne, 2014" included the citation year.
+2. Footer right "3 atoms · source-spotlight" also wrapped, looking cramped.
+
+### v1.1.2 patches (in-branch)
+
+- **Strip citation year from footer.** `_strip_citation_year()` drops trailing `, YYYY` from the displayed source slug. sources.yml lookup still uses the full citation key — only the visual is cleaned. Tested.
+- **Footer nowrap defense.** Added `white-space: nowrap` + gap to footer flex items so future borderline-long content can't wrap into multiple lines.
+
+### v1.1.2 smoke (Hamilton Helmer, 2017)
+
+Added Hamilton Helmer to sources.yml (Strategy Capital founder, author of 7 Powers). Smoke run produced a clean post and diagram. User feedback: "both look great."
+
+### Final state
+
+- Branch: `feat/linkedin-engine-v1.1` with 16 commits (13 v1.1.0 + 2 v1.1.1 + 1 v1.1.2; plus 2 content commits adding K&M and Helmer to sources.yml)
+- Tests: 68/68 pass including live Playwright render smoke
+- Three book sources seeded in sources.yml (Rumelt, Kahneman, Munger, K&M, Helmer); seven atoms now have clean tldrs in 02-knowledge
+
+### v1.1.x follow-ups (not blocking merge)
+
+- `--reset-cooldowns` CLI flag for smoke-testing iteration (cooldowns exhausted Rumelt then K&M within 2-3 smokes; iteration loop is hostile without manual JSON editing)
+- Re-test cross-domain strategies (two_atom_bridge, convergence_finder) — only source_spotlight was end-to-end smoked
+- Slug-safety on source slug for filesystem (carryover from v1.0.1 follow-up #3 — still has comma in bundle paths)
+
 
