@@ -161,6 +161,34 @@ def test_claim_tag_rule_specifies_convergence_role_split():
     assert "synthesis takeaway" in CLAIM_TAG_RULE.lower()
 
 
+def test_voice_prompt_includes_convergence_thesis_override_only_for_convergence():
+    """v1.2.1: CONVERGENCE_THESIS_OVERRIDE rewrites THESIS semantics for convergence only.
+
+    Bridge and source_spotlight must NOT see the override; the universal "standalone
+    aphorism" guidance still applies to them.
+    """
+    from text_generator import CONVERGENCE_THESIS_OVERRIDE, _compose_system_prompt
+
+    convergence_prompt = _compose_system_prompt(strategy="convergence_finder")
+    bridge_prompt = _compose_system_prompt(strategy="two_atom_bridge")
+    spotlight_prompt = _compose_system_prompt(strategy="source_spotlight")
+
+    assert CONVERGENCE_THESIS_OVERRIDE in convergence_prompt
+    assert CONVERGENCE_THESIS_OVERRIDE not in bridge_prompt
+    assert CONVERGENCE_THESIS_OVERRIDE not in spotlight_prompt
+
+
+def test_convergence_thesis_override_specifies_framing_routing():
+    """The override must explicitly tell the LLM the THESIS is framing, not aphorism."""
+    from text_generator import CONVERGENCE_THESIS_OVERRIDE
+
+    assert "FRAMING OBSERVATION" in CONVERGENCE_THESIS_OVERRIDE
+    assert "aphorism" in CONVERGENCE_THESIS_OVERRIDE.lower()
+    # Pattern must explicitly name the role split
+    assert "THESIS = setup" in CONVERGENCE_THESIS_OVERRIDE
+    assert "CLAIM = payoff" in CONVERGENCE_THESIS_OVERRIDE
+
+
 def test_generate_extracts_claim_for_bridge(tmp_path):
     """generate() must populate brief.panel_claim from <CLAIM> for bridge posts."""
     from atom_loader import AtomLoader
