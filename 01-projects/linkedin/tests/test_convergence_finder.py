@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from atom_loader import AtomLoader
@@ -7,12 +9,21 @@ from strategies.convergence_finder import ConvergenceFinder
 from usage.atom_usage import AtomUsageTracker
 
 
+class _ConstantEmbedder:
+    """Returns the same unit vector for every text. All pairs score 1.0."""
+    def embed(self, text: str) -> list[float]:
+        return [1.0, 0.0, 0.0]
+
+
 def _ctx(atom_source, project_root):
+    # Cache lives under project_root/.cache; tmp project_root keeps tests isolated.
+    os.environ["LINKEDIN_PROJECT_ROOT"] = str(project_root)
     loader = AtomLoader(atom_source)
     return StrategyContext(
         loader=loader,
         graph=ConnectionGraph(loader.load_all()),
         atom_tracker=AtomUsageTracker(project_root / "state" / "atom-usage.json"),
+        embedder=_ConstantEmbedder(),
     )
 
 
