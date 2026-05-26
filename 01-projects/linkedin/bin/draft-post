@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Convenience wrapper for the LinkedIn engine CLI.
+# Runs from anywhere; bundles env vars so callers don't paste 5 lines.
+# Forwards all args to: python3 -m cli.draft_post
+#
+# Usage:
+#   ./bin/draft-post --strategy=convergence_finder --topic=feedback
+#   ./bin/draft-post --advance <slug>
+#   ./bin/draft-post --kill <slug> --reason "..."
+#
+# Inside Claude Code, the /draft-post slash command does the same thing.
+
+set -euo pipefail
+
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+VAULT_ROOT="$(cd "$PROJECT_ROOT/../.." && pwd)"
+
+cd "$PROJECT_ROOT"
+
+PYTHONPATH=src \
+LINKEDIN_ATOM_SOURCE="$VAULT_ROOT/02-knowledge" \
+LINKEDIN_PROJECT_ROOT="$PROJECT_ROOT" \
+LINKEDIN_BRAND_SPEC="$PROJECT_ROOT/brand-spec.md" \
+python3 -m cli.draft_post "$@"

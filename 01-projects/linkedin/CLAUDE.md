@@ -43,12 +43,33 @@ for full design.
 
 ## How to run
 
+**Inside Claude Code (preferred):**
+
 ```
-python -m linkedin_engine.cli.draft_post [args]
-python -m linkedin_engine.cli.linkedin_status [args]
+/draft-post --strategy=convergence_finder --topic=feedback
+/draft-post --advance <slug>
+/linkedin-status
 ```
 
-The slash commands at `.claude/commands/draft-post.md` and `.claude/commands/linkedin-status.md` wrap these.
+The slash commands at `.claude/commands/draft-post.md` and `.claude/commands/linkedin-status.md` set env vars internally. No manual `PYTHONPATH=` or `LINKEDIN_*` exports needed.
+
+**Terminal (anywhere on disk):**
+
+```
+./bin/draft-post --strategy=convergence_finder --topic=feedback
+./bin/draft-post --advance <slug>
+```
+
+The wrapper at `01-projects/linkedin/bin/draft-post` bundles `PYTHONPATH=src`, `LINKEDIN_ATOM_SOURCE`, `LINKEDIN_PROJECT_ROOT`, `LINKEDIN_BRAND_SPEC` and forwards args to `python3 -m cli.draft_post`.
+
+**Raw invocation (only when debugging the wrapper itself):**
+
+```
+cd 01-projects/linkedin
+PYTHONPATH=src python -m cli.draft_post [args]
+```
+
+Avoid this form in daily use. If you find yourself pasting env-var prefixes, you're doing it wrong: use the slash command or the wrapper.
 
 ## One-time install
 
