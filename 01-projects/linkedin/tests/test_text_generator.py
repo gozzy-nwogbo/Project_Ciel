@@ -161,32 +161,30 @@ def test_claim_tag_rule_specifies_convergence_role_split():
     assert "synthesis takeaway" in CLAIM_TAG_RULE.lower()
 
 
-def test_voice_prompt_includes_convergence_thesis_override_only_for_convergence():
-    """v1.2.1: CONVERGENCE_THESIS_OVERRIDE rewrites THESIS semantics for convergence only.
-
-    Bridge and source_spotlight must NOT see the override; the universal "standalone
-    aphorism" guidance still applies to them.
+def test_convergence_thesis_override_removed_in_v122():
+    """v1.2.2: CONVERGENCE_THESIS_OVERRIDE was deleted because the LLM bias toward
+    'aphorism in THESIS' was strong enough that the override competed without
+    winning. The 'aphorism on top, synthesis below' shape was accepted as the
+    natural convergence layout. CLAIM_TAG_RULE alone keeps the framing line out
+    of the CLAIM slot, which was the original v1.2 fix.
     """
-    from text_generator import CONVERGENCE_THESIS_OVERRIDE, _compose_system_prompt
+    import text_generator
+
+    assert not hasattr(text_generator, "CONVERGENCE_THESIS_OVERRIDE"), (
+        "CONVERGENCE_THESIS_OVERRIDE should be removed in v1.2.2"
+    )
+
+    # Confirm convergence prompt is just VOICE_SYSTEM_PROMPT + CLAIM_TAG_RULE,
+    # no third layer.
+    from text_generator import (
+        CLAIM_TAG_RULE,
+        VOICE_SYSTEM_PROMPT,
+        _compose_system_prompt,
+    )
 
     convergence_prompt = _compose_system_prompt(strategy="convergence_finder")
-    bridge_prompt = _compose_system_prompt(strategy="two_atom_bridge")
-    spotlight_prompt = _compose_system_prompt(strategy="source_spotlight")
-
-    assert CONVERGENCE_THESIS_OVERRIDE in convergence_prompt
-    assert CONVERGENCE_THESIS_OVERRIDE not in bridge_prompt
-    assert CONVERGENCE_THESIS_OVERRIDE not in spotlight_prompt
-
-
-def test_convergence_thesis_override_specifies_framing_routing():
-    """The override must explicitly tell the LLM the THESIS is framing, not aphorism."""
-    from text_generator import CONVERGENCE_THESIS_OVERRIDE
-
-    assert "FRAMING OBSERVATION" in CONVERGENCE_THESIS_OVERRIDE
-    assert "aphorism" in CONVERGENCE_THESIS_OVERRIDE.lower()
-    # Pattern must explicitly name the role split
-    assert "THESIS = setup" in CONVERGENCE_THESIS_OVERRIDE
-    assert "CLAIM = payoff" in CONVERGENCE_THESIS_OVERRIDE
+    expected = VOICE_SYSTEM_PROMPT + "\n" + CLAIM_TAG_RULE
+    assert convergence_prompt == expected
 
 
 def test_generate_extracts_claim_for_bridge(tmp_path):
