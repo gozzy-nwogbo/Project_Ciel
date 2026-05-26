@@ -48,6 +48,9 @@ class PostBrief:
     draft_text: str = ""
     approved_text: str = ""
     thesis: str = ""
+    aspect_ratio: str = "1:1"
+    panel_label: str = ""
+    panel_claim: str = ""
     edit_delta: Optional[dict[str, Any]] = None
     visual_brief: dict[str, Any] = field(default_factory=dict)
     visual_asset_paths: list[str] = field(default_factory=list)
@@ -90,6 +93,9 @@ class PostBrief:
             draft_text=d.get("draft_text", ""),
             approved_text=d.get("approved_text", ""),
             thesis=d.get("thesis", ""),
+            aspect_ratio=d.get("aspect_ratio", "1:1"),
+            panel_label=d.get("panel_label", ""),
+            panel_claim=d.get("panel_claim", ""),
             edit_delta=d.get("edit_delta"),
             visual_brief=d.get("visual_brief", {}),
             visual_asset_paths=d.get("visual_asset_paths", []),
