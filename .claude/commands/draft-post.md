@@ -11,23 +11,13 @@ Generate or transition LinkedIn post drafts. See `01-projects/linkedin/docs/comm
 
 When the user types `/draft-post [args]`:
 
-1. **Resolve paths.** Set environment so the CLI knows where atoms, project, and brand-spec live:
-   - `LINKEDIN_ATOM_SOURCE=/Users/gozzynwogbo/second-brain/02-knowledge`
-   - `LINKEDIN_PROJECT_ROOT=/Users/gozzynwogbo/second-brain/01-projects/linkedin`
-   - `LINKEDIN_BRAND_SPEC=/Users/gozzynwogbo/second-brain/01-projects/linkedin/brand-spec.md`
-
-2. **Invoke the Python CLI** with the user's flags appended:
+1. **Invoke the wrapper.** All env resolution (PYTHONPATH, LINKEDIN_*, vault dotenv) is handled by `01-projects/linkedin/bin/draft-post`. Single source of truth.
 
    ```bash
-   cd /Users/gozzynwogbo/second-brain/01-projects/linkedin && \
-   PYTHONPATH=src \
-   LINKEDIN_ATOM_SOURCE=/Users/gozzynwogbo/second-brain/02-knowledge \
-   LINKEDIN_PROJECT_ROOT=/Users/gozzynwogbo/second-brain/01-projects/linkedin \
-   LINKEDIN_BRAND_SPEC=/Users/gozzynwogbo/second-brain/01-projects/linkedin/brand-spec.md \
-   python -m cli.draft_post $ARGS
+   /Users/gozzynwogbo/second-brain/01-projects/linkedin/bin/draft-post $ARGS
    ```
 
-3. **After invocation:**
+2. **After invocation:**
    - Read the bundle's `text.md` and `meta.json` from `01-projects/linkedin/backlog/<slug>/` to surface the result.
    - Report: the slug, the angle, the strategy used, and any voice-linter annotations.
 
