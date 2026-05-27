@@ -99,7 +99,12 @@ def test_full_pipeline_convergence_finder(atom_source, project_root, brand_spec,
         ))]
     )
 
+    class _ConstantEmbedder:
+        def embed(self, text):
+            return [1.0, 0.0, 0.0]
+
     with patch("cli.draft_post._make_anthropic_client", return_value=mock_anthropic), \
+         patch("cli.draft_post._make_embedder", return_value=_ConstantEmbedder()), \
          patch("anthropic.Anthropic", return_value=mock_anthropic):
         # 1. Generate
         rc = draft_post_main([

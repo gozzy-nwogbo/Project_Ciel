@@ -11,12 +11,17 @@ from usage.atom_usage import AtomUsageTracker
 from usage.connection_usage import ConnectionUsageTracker
 
 
+class Embedder(Protocol):
+    def embed(self, text: str) -> list[float]: ...
+
+
 @dataclass
 class StrategyContext:
     loader: AtomLoader
     graph: ConnectionGraph
     atom_tracker: AtomUsageTracker
     connection_tracker: ConnectionUsageTracker | None = None
+    embedder: Embedder | None = None
 
 
 class Strategy(Protocol):

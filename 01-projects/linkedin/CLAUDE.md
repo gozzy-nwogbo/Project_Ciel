@@ -40,6 +40,7 @@ for full design.
 - State transitions ALWAYS go through the storage adapter, never direct JSON writes.
 - Atom source path is configurable: defaults to `../../02-knowledge/` relative to project root.
 - When extracted from the vault, point the atom source config at any directory of atom markdown files.
+- `convergence_finder` (v1.3+) selects atom triples by semantic coherence using OpenAI `text-embedding-3-small`. Requires `OPENAI_API_KEY` in env. Embeddings cached at `.cache/atom-embeddings.json` (gitignored, SHA-256 body-hash invalidated). Default coherence threshold is `0.35` min pairwise cosine; override via `LINKEDIN_CONVERGENCE_MIN_SIM` env var or per-call `min_sim` param. When no candidate triple clears the threshold, the strategy raises `ValueError` with a diagnostic payload (best min_sim, top 3 candidate slug triples). Graph-connectivity is no longer a selection signal for this strategy.
 
 ## How to run
 

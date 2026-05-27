@@ -1,5 +1,6 @@
 anthropic==0.40.0
 Jinja2==3.1.4
+openai>=1.40
 playwright==1.49.1
 python-frontmatter==1.1.0
 PyYAML==6.0.2
