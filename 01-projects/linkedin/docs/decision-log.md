@@ -438,3 +438,65 @@ New module `src/embeddings/` with three files:
 - Migration to a vector DB or Supabase. Premature at this scale.
 - Re-introducing connectivity as a soft tiebreaker or weighted signal. Revisit only if pure coherence ranking surfaces fringe atoms in practice.
 
+---
+
+## 2026-05-27 — v1.3 smoke result
+
+Re-ran the v1.2.2 failure case (`convergence_finder --topic=feedback`) against the new coherence-ranking strategy. Branch tip: `a8aac7b` (5 implementation commits + wrapper dotenv fix).
+
+### Atoms picked
+
+| Slug | Domain | Source/Author |
+|---|---|---|
+| `transformational-coping` | mental-models | Csikszentmihalyi (flow research) |
+| `expectancy-postponement` | philosophy-resilience | Seneca (Stoic letters) |
+| `territorial-orientation` | style-voice-craft | Pressfield (creative-war essays) |
+
+### Coherence score
+
+`min_sim = 0.4327` against a threshold of `0.35`. About 24% headroom. The cache populated all candidate atoms on first run; subsequent runs would hit cache for any atom whose body/title hash is unchanged.
+
+### Differs from v1.2.2 pick entirely
+
+v1.2.2 picked `shallowing-hypothesis + npd-for-ai + door-shut-door-open` (attention/scrolling, AI product methodology, creative drafting workflow). All three shared the `feedback` tag but addressed different *kinds* of feedback. v1.3 picks an entirely different trio because the v1.2.2 atoms scored a low min_sim and coherence-ranking surfaced a better candidate.
+
+The new triple all address the same underlying mechanism: **what to do when external feedback is missing or hostile**. Three different traditions (psychology, Stoic philosophy, creative-process literature) converging on the same problem from different angles. Convergence is now semantic not just tag-shared.
+
+### Generated post
+
+Mocked Anthropic in tests; this smoke uses real Anthropic with the live VOICE_SYSTEM_PROMPT. Sonnet returned (verbatim):
+
+> Three atoms collided in my second brain this week, each from a different shelf, each answering the same question: what do you do when external feedback goes silent or sour?
+>
+> Csikszentmihalyi, the flow researcher, calls it Transformational Coping. A "dissipative structure of the mind" that takes a brutal event and metabolizes it into a challenge that strengthens the self.
+>
+> Seneca, the Stoic letter-writer, attacks the opposite failure mode: Expectancy, the habit of postponing life by hanging it on tomorrow. The feedback you're waiting for is the trap.
+>
+> Pressfield, who writes on the creative war, names the cure Territorial Orientation. You define yourself by the turf you work, a gym, a piano, a page, and sustenance comes from effort, not applause.
+>
+> When the world stops clapping, you either transform the input, refuse to wait on it, or stop needing it.
+>
+> Three centuries apart. One muscle.
+>
+> Which of the three is your default move?
+
+### User feedback
+
+"i like this text a lot more"
+
+The v1.2.2 smoke pulled "the text slumped me. it's not bad i just didnt get it." The v1.3 pick is digestible because the three atoms genuinely converge on one mechanism, not three different things sharing a label.
+
+### Calibration note
+
+Threshold 0.35 worked first try. The winning triple landed at 0.4327, comfortably above. No env-var override needed. Recommend keeping the default for the next 5–10 runs; if multiple legitimate convergence topics start producing threshold errors, lower to 0.30. If multiple ship-worthy posts come from triples in the 0.35–0.45 band (as this one did), the threshold is correctly calibrated.
+
+### Wrapper follow-up landed in the same branch
+
+The smoke surfaced a missing piece: `bin/draft-post` did not source the vault dotenv, so `OPENAI_API_KEY` could not reach the Python process. Fixed in commit `a8aac7b`. The slash command at `.claude/commands/draft-post.md` duplicates the env wiring and has the same gap. Not blocking; logged as a v1.3.1+ follow-up.
+
+### v1.3+ follow-ups (not blocking)
+
+- `.claude/commands/draft-post.md` should delegate to `./bin/draft-post` instead of duplicating env wiring.
+- Carryover from v1.2.x: `--reset-cooldowns` flag, slug-safety on source slug, `atom_card.html.j2` migration to shared CSS partial, renderer-side domain validation, voice-linter contrastive-framing reinforcement at CLAIM-time.
+- After 5–10 more convergence smokes, audit `logs/state.jsonl` (via `brief.strategy_params.min_sim`) and decide whether threshold needs adjustment.
+
